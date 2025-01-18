@@ -1,0 +1,25 @@
+# IntelliJ IDEA files
+.idea/
+*.iml
+
+# Local properties
+local.properties
+
+# Build output
+/build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aar
+
+# Google services file
+google-services.json
+
+# Gradle files
+.gradle/
+out/
+
+# System-specific files
+.DS_Store
+Thumbs.db
