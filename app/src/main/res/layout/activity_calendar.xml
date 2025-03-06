@@ -1,13 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="16dp">
 
+    <!-- Title -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="캘린더 화면"
+        android:text="일정 관리"
         android:textSize="20sp"
-        android:textStyle="bold"/>
-</RelativeLayout>
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:background="#1976D2"
+        android:padding="12dp"/>
+
+    <!-- CalendarView -->
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:theme="@style/CalendarStyle"/>
+
+
+    <!-- Selected Schedule Info -->
+    <TextView
+        android:id="@+id/tvSelectedSchedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        android:text="선택된 일정이 없습니다."
+        android:background="#E3F2FD"
+        android:gravity="center"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
