@@ -42,8 +42,6 @@ class HistoryActivity : AppCompatActivity() {
 
         historyList.clear() // ✅ 기존 데이터 초기화 (중복 방지)
 
-        historyList.add(HistoryItem("📌 지난 검진 결과: 정상\n2024년 10월 12일")) // Mock Data
-
         // 저장된 일정 추가
         for (history in savedHistory) {
             historyList.add(HistoryItem(history))
