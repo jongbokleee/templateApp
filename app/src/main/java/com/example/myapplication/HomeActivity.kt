@@ -95,12 +95,13 @@ class HomeActivity : AppCompatActivity() {
         // 일정들을 날짜 순으로 정렬
         val sortedSchedules = historySet.sortedBy { extractDate(it) }
 
-        val upcomingCheckup = sortedSchedules.lastOrNull() ?: "현재 예정된 건강검진 일정 없음"
-        val lastCheckup = sortedSchedules.dropLast(1).lastOrNull() ?: "이전 건강검진 기록 없음"
+        val upcomingCheckup = sortedSchedules.lastOrNull() ?: "예정된 건강검진 일정이 없습니다"
+        val lastCheckup = sortedSchedules.dropLast(1).lastOrNull() ?: "이전 건강검진 기록이 없습니다"
+        val deadlineReminder = if (sortedSchedules.isNotEmpty()) "⏳ 이달 말까지 검진을 받아야 합니다." else "예정된 건강검진 일정이 없습니다"
 
         return listOf(
             HomeSection("📅 다가오는 건강검진 일정", listOf(upcomingCheckup)),
-            HomeSection("🔔 검진 마감일 알림", listOf("⏳ 이달 말까지 검진을 받아야 합니다.")),
+            HomeSection("\uD83D\uDD14 검진 마감일 알림", listOf(deadlineReminder)),
             HomeSection("📊 마지막 검진 기록", listOf(lastCheckup))
         )
     }

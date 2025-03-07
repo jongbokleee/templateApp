@@ -40,4 +40,15 @@
         android:background="#E3F2FD"
         android:gravity="center"
         android:layout_marginTop="16dp"/>
+
+    <!-- 뒤로 가기 버튼 -->
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="뒤로 가기"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#000000"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"/>
 </LinearLayout>

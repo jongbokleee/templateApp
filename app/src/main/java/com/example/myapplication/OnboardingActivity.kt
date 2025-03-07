@@ -2,6 +2,8 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityOnboardingBinding
 
@@ -12,13 +14,15 @@ class OnboardingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // ViewBinding 초기화
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.startButton.setOnClickListener {
-            val intent = Intent(this@OnboardingActivity, HomeActivity::class.java)
+        // 일정 시간 후 홈 화면으로 자동 이동 (1초 후)
+        Handler(Looper.getMainLooper()).postDelayed({
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
-            finish()
-        }
+            finish() // 온보딩 화면 종료
+        }, 1000) // 1초 후 실행
     }
 }

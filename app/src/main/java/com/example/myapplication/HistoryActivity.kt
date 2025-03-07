@@ -28,6 +28,11 @@ class HistoryActivity : AppCompatActivity() {
         historyAdapter = HistoryAdapter(historyList)
         binding.recyclerViewHistory.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewHistory.adapter = historyAdapter
+
+        // 뒤로 가기 버튼 클릭 시 액티비티 종료
+        binding.backButton.setOnClickListener {
+            finish()
+        }
     }
 
     // 📌 기록 데이터 로드 (기본값 + 저장된 일정 불러오기)

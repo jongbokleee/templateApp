@@ -9,11 +9,6 @@ class CalendarActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCalendarBinding
 
-    // Mock 일정 데이터 (Key: 날짜, Value: 일정 내용)
-    private val mockSchedules = mapOf(
-        "2025-03-05" to "건강검진 서울 중앙병원"
-    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -25,10 +20,17 @@ class CalendarActivity : AppCompatActivity() {
 
         val schedules = historySet.toList()
 
+        // 뒤로 가기 버튼 클릭 시 액티비티 종료
+        binding.backButton.setOnClickListener {
+            finish()
+        }
+
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val selectedDate = "$year-${month + 1}-$dayOfMonth"
             val schedule = schedules.find { it.contains(selectedDate) } ?: "선택된 일정이 없습니다."
             binding.tvSelectedSchedule.text = schedule
         }
     }
+
+
 }

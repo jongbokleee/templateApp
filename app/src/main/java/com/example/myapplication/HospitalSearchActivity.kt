@@ -30,6 +30,11 @@ class HospitalSearchActivity : AppCompatActivity() {
         binding.recyclerViewHospitals.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewHospitals.adapter = hospitalAdapter
 
+        // 뒤로 가기 버튼 클릭 시 액티비티 종료
+        binding.backButton.setOnClickListener {
+            finish()
+        }
+
         // 검색 기능
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
