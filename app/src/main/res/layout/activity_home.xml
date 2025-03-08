@@ -29,17 +29,26 @@
         android:layout_marginTop="8dp"
         android:padding="8dp"/>
 
-    <!-- 검진 일정 추가 버튼 (FAB) -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnAddSchedule"
-        android:layout_width="wrap_content"
+    <!-- 본인인증 필요 안내 문구 -->
+    <TextView
+        android:id="@+id/tvLoginRequired"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_gravity="end|bottom"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/green"
-        app:layout_anchor="@id/bottomNavigation"
-        app:layout_anchorGravity="top|end"/>
+        android:text="일정을 추가하려면 본인인증이 필요합니다."
+        android:textSize="14sp"
+        android:textColor="#808080"
+        android:gravity="center"
+        />
+
+    <Button
+        android:id="@+id/homeBtnAddSchedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="검진 일정 추가하기"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1976D2"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
