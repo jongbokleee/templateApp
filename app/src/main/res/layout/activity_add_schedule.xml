@@ -65,25 +65,6 @@
             android:theme="@style/CalendarStyle"
             />
 
-        <!-- 마감 리마인더 설정 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:text="🔔 검진 마감 리마인더 설정"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
-
-        <Button
-            android:id="@+id/btnReminder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="마감일 알림 받기"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#FFC107"
-            android:layout_marginTop="8dp"/>
-
         <Button
             android:id="@+id/btnAddSchedule"
             android:layout_width="match_parent"

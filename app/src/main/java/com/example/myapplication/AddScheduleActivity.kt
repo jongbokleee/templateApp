@@ -1,6 +1,8 @@
 package com.example.myapplication
 
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -8,6 +10,7 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityAddScheduleBinding
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AddScheduleActivity : AppCompatActivity() {
@@ -53,30 +56,23 @@ class AddScheduleActivity : AppCompatActivity() {
             Toast.makeText(this, "선택한 날짜: $selectedDate", Toast.LENGTH_SHORT).show()
         }
 
-        // 마감 리마인더 설정
-        binding.btnReminder.setOnClickListener {
-            val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                val reminderDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
-                Toast.makeText(this, "마감 리마인더 설정: $reminderDate", Toast.LENGTH_SHORT).show()
-            }, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH), Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
-            datePickerDialog.show()
-        }
 
         // 일정 추가 버튼 클릭 시 데이터 저장 후 홈 & 기록 & 일정 탭에 반영
         binding.btnAddSchedule.setOnClickListener {
-            val age = binding.etAge.text.toString()
-            if (age.isEmpty() || selectedHospital == null || selectedDate == null) {
+            if (selectedHospital == null || selectedDate == null) {
                 Toast.makeText(this, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val newSchedule = "건강검진 | $selectedHospital | $selectedDate"
             saveSchedule(newSchedule) // ✅ 일정 저장
+            setReminderNotification(selectedDate!!) // 자동으로 전날 알림 설정
 
             // 홈 화면 및 기록 탭으로 데이터 전달
             val intent = Intent(this, HomeActivity::class.java)
             intent.putExtra("newSchedule", newSchedule)
             startActivity(intent)
+            Toast.makeText(this, "일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
             finish()
         }
 
@@ -98,5 +94,27 @@ class AddScheduleActivity : AppCompatActivity() {
         // 데이터 저장
         editor.putStringSet("historyList", savedHistory)
         editor.apply()
+    }
+
+    // **📌 검진 예약일 하루 전 알림 설정**
+    private fun setReminderNotification(selectedDate: String) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val selectedCalendar = Calendar.getInstance()
+
+        try {
+            val parsedDate = dateFormat.parse(selectedDate)
+            if (parsedDate != null) {
+                selectedCalendar.time = parsedDate
+                selectedCalendar.add(Calendar.DAY_OF_MONTH, -1) // 선택한 날짜 하루 전으로 설정
+
+                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val intent = Intent(this, ReminderReceiver::class.java)
+                val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, selectedCalendar.timeInMillis, pendingIntent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
