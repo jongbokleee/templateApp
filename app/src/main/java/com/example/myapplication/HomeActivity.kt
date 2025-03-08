@@ -102,7 +102,7 @@ class HomeActivity : AppCompatActivity() {
         return listOf(
             HomeSection("📅 다가오는 건강검진 일정", listOf(upcomingCheckup)),
             HomeSection("\uD83D\uDD14 검진 마감일 알림", listOf(deadlineReminder)),
-            HomeSection("📊 마지막 검진 기록", listOf(lastCheckup))
+            HomeSection("📊 마지막 검진 신청 기록", listOf(lastCheckup))
         )
     }
 

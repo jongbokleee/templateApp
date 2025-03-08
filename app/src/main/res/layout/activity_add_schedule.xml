@@ -25,27 +25,6 @@
             android:gravity="center"
             android:padding="12dp"/>
 
-        <!-- 검진 대상 확인 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="📅 검진 대상 확인"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
-
-        <EditText
-            android:id="@+id/etAge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:textColorHint="#808080"
-            android:hint="나이를 입력하세요"
-            android:background="@android:drawable/editbox_background"
-            android:padding="12dp"
-            android:layout_marginTop="8dp"/>
-
         <!-- 병원 선택 -->
         <TextView
             android:layout_width="match_parent"
@@ -102,7 +81,7 @@
             android:layout_height="wrap_content"
             android:text="마감일 알림 받기"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="#FFC107"
             android:layout_marginTop="8dp"/>
 
         <Button
@@ -111,7 +90,7 @@
             android:layout_height="wrap_content"
             android:text="일정 추가하기"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="#1976D2"
             android:layout_marginTop="16dp"/>
 
         <!-- 뒤로 가기 버튼 -->
