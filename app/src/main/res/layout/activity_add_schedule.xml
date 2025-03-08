@@ -1,87 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:fillViewport="true"
     android:background="#FFFFFF"
-    >
+    android:padding="16dp">
 
-    <LinearLayout
+
+    <!-- 제목 -->
+    <TextView
+        android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:text="건강검진 일정 추가"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#1976D2"
+        android:gravity="center"
+        android:padding="12dp"/>
 
-        <!-- 제목 -->
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="건강검진 일정 추가"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="#1976D2"
-            android:gravity="center"
-            android:padding="12dp"/>
+    <!-- 병원 선택 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🏥 검진 받을 병원 선택"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
 
-        <!-- 병원 선택 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🏥 검진 받을 병원 선택"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
+    <Spinner
+        android:id="@+id/spinnerHospital"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:textColor="#000000"
+        android:popupBackground="@android:color/white"/>
+        <!-- ✅ 리소스 참조 -->
 
-        <Spinner
-            android:id="@+id/spinnerHospital"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/edit_text"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:textColor="#000000"
-            android:popupBackground="@android:color/white"/>
-            <!-- ✅ 리소스 참조 -->
+    <!-- 검진 예약 일정 추가 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="⏳ 검진 예약 일정 추가"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
 
-        <!-- 검진 예약 일정 추가 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="⏳ 검진 예약 일정 추가"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:theme="@style/CalendarStyle"
+        />
 
-        <CalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="8dp"
-            android:theme="@style/CalendarStyle"
-            />
+    <Button
+        android:id="@+id/btnAddSchedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="일정 추가하기"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1976D2"
+        android:layout_marginTop="16dp"/>
 
-        <Button
-            android:id="@+id/btnAddSchedule"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="일정 추가하기"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#1976D2"
-            android:layout_marginTop="16dp"/>
-
-        <!-- 뒤로 가기 버튼 -->
-        <Button
-            android:id="@+id/backButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="뒤로 가기"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#000000"
-            android:layout_marginTop="16dp"/>
-    </LinearLayout>
-</ScrollView>
+    <!-- 뒤로 가기 버튼 -->
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="뒤로 가기"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#000000"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
