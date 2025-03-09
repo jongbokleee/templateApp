@@ -1,113 +1,84 @@
 package com.bienbetter.application
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.bienbetter.application.adapter.HomeSectionAdapter
 import com.bienbetter.application.databinding.ActivityHomeBinding
-import com.bienbetter.application.model.HomeSection
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var homeSectionAdapter: HomeSectionAdapter
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ViewBinding 초기화
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 홈 화면 Mock 데이터 로드
-        val newSchedule = intent.getStringExtra("newSchedule")
-        val mockData = loadMockData(newSchedule)
+        // ✅ Firebase 초기화
+        auth = FirebaseAuth.getInstance()
 
-        // RecyclerView 설정
-        homeSectionAdapter = HomeSectionAdapter(mockData) { sectionTitle ->
-            when (sectionTitle) {
-                "📅 다가오는 건강검진 일정" -> navigateToScheduleTab()
-                "📊 마지막 검진 기록" -> navigateToHistoryTab() // Move to History tab
-            }
-        }
+        // ✅ 현재 로그인 상태 확인 후 UI 업데이트
+        updateUI(auth.currentUser)
 
-        binding.recyclerViewHome.layoutManager = LinearLayoutManager(this)
-        binding.recyclerViewHome.adapter = homeSectionAdapter
-
-        // 검진 일정 추가 버튼 클릭 시 AddScheduleActivity로 이동
+        // ✅ 로그인 여부 확인 → 검진일정 추가 클릭 시 로그인 안 되어 있으면 로그인 페이지로 이동
         binding.homeBtnAddSchedule.setOnClickListener {
-            val intent = Intent(this, AddScheduleActivity::class.java)
-            startActivity(intent)
-        }
-
-
-        // 하단 내비게이션 클릭 리스너 설정
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> true // 현재 화면 유지
-                R.id.nav_calendar -> {
-                    startActivity(Intent(this, CalendarActivity::class.java))
-                    true
-                }
-                R.id.nav_hospital -> {
-                    startActivity(Intent(this, HospitalSearchActivity::class.java))
-                    true
-                }
-                R.id.nav_history -> {
-                    startActivity(Intent(this, HistoryActivity::class.java))
-                    true
-                }
-                R.id.nav_settings -> {
-                    startActivity(Intent(this, SettingsActivity::class.java))
-                    true
-                }
-                else -> false
+            if (auth.currentUser != null) {
+                // ✅ 로그인 상태 → 검진 일정 추가 화면으로 이동
+                startActivity(Intent(this, AddScheduleActivity::class.java))
+            } else {
+                // ✅ 로그인 안 된 경우 → 로그인 화면으로 이동
+                startActivityForResult(Intent(this, LoginActivity::class.java), REQUEST_SIGN_IN)
             }
         }
-    }
 
-    // 📌 일정 탭으로 이동하는 함수
-    private fun navigateToScheduleTab() {
-        binding.bottomNavigation.selectedItemId = R.id.nav_calendar
-        startActivity(Intent(this, CalendarActivity::class.java))
-    }
-    // 📌 기록 탭으로 이동하는 함수
-    private fun navigateToHistoryTab() {
-        binding.bottomNavigation.selectedItemId = R.id.nav_history
-        startActivity(Intent(this, HistoryActivity::class.java))
-    }
-
-
-    // 📌 Mock 데이터 생성 (새 일정 추가 포함)
-    private fun loadMockData(newSchedule: String?): List<HomeSection> {
-        val sharedPreferences = getSharedPreferences("검진기록", Context.MODE_PRIVATE)
-        val historySet = sharedPreferences.getStringSet("historyList", setOf())?.toMutableSet() ?: mutableSetOf()
-
-        // 새 일정이 있으면 추가
-        if (!newSchedule.isNullOrEmpty()) {
-            historySet.add(newSchedule)
-            // 저장된 일정 업데이트
-            sharedPreferences.edit().putStringSet("historyList", historySet).apply()
+        // ✅ 로그아웃 버튼 클릭 시 로그아웃 처리
+        binding.btnLogout.setOnClickListener {
+            logout()
         }
-
-        // 일정들을 날짜 순으로 정렬
-        val sortedSchedules = historySet.sortedBy { extractDate(it) }
-
-        val upcomingCheckup = sortedSchedules.lastOrNull() ?: "예정된 건강검진 일정이 없습니다"
-        val lastCheckup = sortedSchedules.dropLast(1).lastOrNull() ?: "이전 건강검진 기록이 없습니다"
-        val deadlineReminder = if (sortedSchedules.isNotEmpty()) "⏳ 건강 검진 전날에 알림이 갑니다." else "예정된 건강검진 일정이 없습니다"
-
-        return listOf(
-            HomeSection("📅 다가오는 건강검진 일정", listOf(upcomingCheckup)),
-            HomeSection("\uD83D\uDD14 검진 일정 알림", listOf(deadlineReminder)),
-            HomeSection("📊 마지막 검진 신청 기록", listOf(lastCheckup))
-        )
     }
 
-    // 📌 날짜를 추출하는 함수 (문자열에서 날짜 부분만 가져오기)
-    private fun extractDate(schedule: String): String {
-        return schedule.split("|").last().trim() // 예: "건강검진 | 서울 중앙병원 | 2025-03-05" → "2025-03-05"
+    // ✅ "뒤로 가기" 했을 때 로그인 상태 즉시 반영
+    override fun onResume() {
+        super.onResume()
+        updateUI(auth.currentUser)
     }
+
+    // ✅ 로그인 상태에 따라 UI 업데이트
+    private fun updateUI(user: FirebaseUser?) {
+        val isLoggedIn = user != null
+        // 로그인 상태면 로그아웃 버튼 표시, 로그인 버튼 숨김
+        binding.btnLogout.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+    }
+
+    // ✅ 로그아웃 처리
+    private fun logout() {
+        auth.signOut() // ✅ Firebase 로그아웃
+        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut().addOnCompleteListener {
+            updateUI(null)  // ✅ 로그아웃 후 UI 업데이트
+            Toast.makeText(this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // ✅ 로그인 결과 처리 (즉시 반영)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_SIGN_IN) {
+            val user = auth.currentUser
+            updateUI(user) // ✅ 로그인 성공 시 UI 업데이트
+        }
+    }
+
+    companion object {
+        private const val REQUEST_SIGN_IN = 1001
+    }
+
 }

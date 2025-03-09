@@ -34,11 +34,11 @@
         android:id="@+id/tvLoginRequired"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="일정을 추가하려면 본인인증이 필요합니다."
+        android:text="일정 추가는 로그인 후 가능합니다."
         android:textSize="14sp"
         android:textColor="#808080"
         android:gravity="center"
-        />
+        android:visibility="visible"/>
 
     <Button
         android:id="@+id/homeBtnAddSchedule"
@@ -49,6 +49,16 @@
         android:backgroundTint="#1976D2"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="로그아웃"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FF0000"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"/> <!-- 기본적으로 숨김 -->
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
