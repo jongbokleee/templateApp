@@ -59,14 +59,4 @@
         android:backgroundTint="#FF0000"
         android:layout_marginTop="16dp"
         android:visibility="gone"/> <!-- 기본적으로 숨김 -->
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
-        app:menu="@menu/bottom_navigation_menu"/>
 </LinearLayout>

@@ -70,7 +70,7 @@ class AddScheduleActivity : AppCompatActivity() {
             setReminderNotification(selectedDate!!) // ✅ 전날 알림 설정
 
             // ✅ 홈 화면 및 기록 탭으로 데이터 전달
-            val intent = Intent(this, HomeActivity::class.java)
+            val intent = Intent(this, HomeFragment::class.java)
             intent.putExtra("newSchedule", newSchedule)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP // 기존 액티비티 스택 정리
             startActivity(intent)

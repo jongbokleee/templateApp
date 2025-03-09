@@ -22,19 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeActivity"
-            android:exported="true" />
-        <activity
-            android:name=".CalendarActivity"
-            android:exported="true" />
-        <activity
-            android:name=".HospitalSearchActivity"
-            android:exported="true" />
-        <activity
-            android:name=".HistoryActivity"
-            android:exported="true" />
-        <activity
-            android:name=".SettingsActivity"
+            android:name=".MainActivity"
             android:exported="true" />
         <activity
             android:name=".AddScheduleActivity"
