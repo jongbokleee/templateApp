@@ -7,7 +7,6 @@
     android:background="#FFFFFF"
     android:padding="0dp">
 
-    <!-- Title -->
     <TextView
         android:id="@+id/titleText"
         android:layout_width="match_parent"
@@ -20,16 +19,27 @@
         android:background="#1976D2"
         android:padding="12dp"/>
 
+    <!-- 다가오는 건강검진 일정에 관한 데이터 파이어베이스에서 조회해서 추가-->
+    <TextView
+        android:id="@+id/tvUpcomingCheckup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📅 다가오는 건강검진 일정"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <!-- 검진 마감일 알림에 관한 데이터 파이어베이스에서 조회해서 추가-->
+    <!-- 마지막 검진 기록에 관한 데이터 파이어베이스에서 조회해서 추가-->
+
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewHome"
+        android:id="@+id/recyclerViewSchedules"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="8dp"
         android:padding="8dp"/>
 
-    <!-- 본인인증 필요 안내 문구 -->
     <TextView
         android:id="@+id/tvLoginRequired"
         android:layout_width="match_parent"
@@ -58,5 +68,5 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FF0000"
         android:layout_marginTop="16dp"
-        android:visibility="gone"/> <!-- 기본적으로 숨김 -->
+        android:visibility="gone"/>
 </LinearLayout>
