@@ -101,16 +101,23 @@ class AddScheduleActivity : AppCompatActivity() {
         }
     }
 
-    // **📌 Firebase Realtime Database에 일정 저장**
+    // **📌 Firebase Realtime Database에 일정 저장 (uid 기반 저장)**
     private fun saveScheduleToFirebase(schedule: Map<String, Any?>) {
-        val scheduleId = database.push().key ?: return
-        database.child(scheduleId).setValue(schedule)
+        val userId = auth.currentUser?.uid ?: return // 🔹 로그인한 사용자 UID 가져오기
+        val scheduleId = database.child(userId).push().key ?: return // 🔹 UID 하위에 일정 저장
+
+        val scheduleWithUid = schedule.toMutableMap().apply {
+            put("uid", userId) // 🔹 UID 추가
+        }
+
+        database.child(userId).child(scheduleId).setValue(scheduleWithUid)
             .addOnSuccessListener {
                 Toast.makeText(this, "일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
                 setReminderNotification(schedule["date"].toString()) // 🔹 알람 설정
 
                 // ✅ 홈 화면으로 이동
-                val intent = Intent(this, HomeFragment::class.java)
+                val intent = Intent(this, MainActivity::class.java) // 🔹 MainActivity에서 HomeFragment로 이동
+                intent.putExtra("navigateTo", "HomeFragment") // 🔹 프래그먼트 전환을 위한 데이터 전달
                 startActivity(intent)
                 finish()
             }

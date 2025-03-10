@@ -62,10 +62,18 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // ✅ 프래그먼트가 다시 보일 때 로그인 상태 갱신
+    override fun onResume() {
+        super.onResume()
+        updateUI(auth.currentUser != null)
+    }
+
     // ✅ Firebase에서 일정 데이터 불러오기
     private fun loadSchedulesFromFirebase() {
         val userId = auth.currentUser?.uid ?: return
-        database.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+        val databaseRef = FirebaseDatabase.getInstance().getReference("schedules").child(userId)
+
+        databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 scheduleList.clear()
 
@@ -83,6 +91,7 @@ class HomeFragment : Fragment() {
                     val currentDate = System.currentTimeMillis()
                     val scheduleTime = date.toLongOrNull() ?: currentDate
 
+                    // 🔹 최신 일정 찾기
                     if (scheduleTime >= currentDate) {
                         upcomingCheckup = "✔ 다가오는 건강검진: $hospital - $date"
                         deadlineReminder = "⏳ 검진 마감일: $date 전까지 검진 필요"
