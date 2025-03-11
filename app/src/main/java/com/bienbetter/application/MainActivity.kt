@@ -20,17 +20,14 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // ✅ 프래그먼트 관리 개선 (add / show / hide 방식)
         setupFragments()
 
-        // ✅ Intent를 통해 특정 Fragment로 이동하는 경우 처리
         val navigateTo = intent.getStringExtra("navigateTo")
         if (navigateTo == "HomeFragment") {
             switchFragment(homeFragment)
             binding.bottomNavigation.selectedItemId = R.id.nav_home
         }
 
-        // ✅ 하단 내비게이션 클릭 시 `Fragment` 전환
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> switchFragment(homeFragment)
@@ -43,14 +40,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ 프래그먼트 객체 선언 (프래그먼트가 매번 새로 생성되지 않도록)
     private val homeFragment = HomeFragment()
     private val calendarFragment = CalendarFragment()
     private val hospitalFragment = HospitalSearchFragment()
     private val historyFragment = HistoryFragment()
     private val settingsFragment = SettingsFragment()
 
-    // ✅ `Fragment` 초기화
     private fun setupFragments() {
         supportFragmentManager.beginTransaction()
             .add(R.id.fragmentContainer, homeFragment, "HomeFragment")
@@ -62,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         activeFragment = homeFragment
     }
 
-    // ✅ `Fragment` 전환 함수 (기존 Fragment 숨기고 새로운 Fragment 표시)
     private fun switchFragment(targetFragment: Fragment) {
         if (activeFragment != targetFragment) {
             supportFragmentManager.beginTransaction()

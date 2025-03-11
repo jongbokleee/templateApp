@@ -77,6 +77,9 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+
+
+
                     val user = auth.currentUser
                     if (user != null) {
                         saveUserToDatabase(user) // ✅ 사용자 정보를 Realtime Database에 저장
