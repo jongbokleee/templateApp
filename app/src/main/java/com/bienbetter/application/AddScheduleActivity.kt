@@ -113,6 +113,7 @@ class AddScheduleActivity : AppCompatActivity() {
         database.child(userId).child(scheduleId).setValue(scheduleWithUid)
             .addOnSuccessListener {
                 Toast.makeText(this, "일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
+                // setReminderNotification() 호출 → 검진 하루 전 알람 설정
                 setReminderNotification(schedule["date"].toString()) // 🔹 알람 설정
 
                 // ✅ 홈 화면으로 이동
@@ -137,20 +138,27 @@ class AddScheduleActivity : AppCompatActivity() {
                 selectedCalendar.time = parsedDate
                 selectedCalendar.add(Calendar.DAY_OF_MONTH, -1) // 하루 전 알림
 
-                val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                val intent = Intent(this, ReminderReceiver::class.java)
-                val pendingIntent = PendingIntent.getBroadcast(
-                    this, 0, intent, PendingIntent.FLAG_MUTABLE
-                )
+                val userId = auth.currentUser?.uid ?: return
+                val timestamp = selectedCalendar.timeInMillis // 예약 하루 전의 타임스탬프
 
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    selectedCalendar.timeInMillis,
-                    pendingIntent
-                )
+                // ✅ FCM 푸시 알림 전송
+                sendPushNotificationToUser(userId, selectedDate, timestamp)
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
+    private fun sendPushNotificationToUser(userId: String, selectedDate: String, timestamp: Long) {
+        val notificationData = mapOf(
+            "userId" to userId,
+            "title" to "예약 하루 전 알림",
+            "body" to "예약일 ($selectedDate) 하루 전입니다. 병원을 확인하세요!",
+            "timestamp" to timestamp
+        )
+
+        val fcmDatabase = FirebaseDatabase.getInstance().reference.child("notifications")
+        fcmDatabase.child(userId).push().setValue(notificationData)
+    }
+
 }
