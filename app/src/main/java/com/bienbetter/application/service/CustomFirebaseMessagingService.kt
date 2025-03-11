@@ -20,11 +20,18 @@ class CustomFirebaseMessagingService : FirebaseMessagingService() {
         super.onNewToken(token)
         Log.d("FCM", "새로운 FCM 토큰: $token")
 
-        // ✅ Firebase Realtime Database에 토큰 저장
+        // ✅ FCM 토큰을 저장하는 함수 호출
+        saveFcmTokenToDatabase(token)
+    }
+
+    // ✅ FCM 토큰을 Firebase Realtime Database에 저장
+    private fun saveFcmTokenToDatabase(token: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             val databaseRef = FirebaseDatabase.getInstance().reference
             databaseRef.child("users").child(userId).child("fcmToken").setValue(token)
+                .addOnSuccessListener { Log.d("FCM", "FCM 토큰 저장 완료") }
+                .addOnFailureListener { Log.e("FCM", "FCM 토큰 저장 실패", it) }
         }
     }
 
