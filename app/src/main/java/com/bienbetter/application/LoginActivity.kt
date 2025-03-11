@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
 
@@ -77,9 +78,6 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-
-
-
                     val user = auth.currentUser
                     if (user != null) {
                         saveUserToDatabase(user) // ✅ 사용자 정보를 Realtime Database에 저장
@@ -90,7 +88,7 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ 5 Firebase Database에 사용자 정보 저장 (선택)
+    // ✅ 5 Firebase Database에 사용자 정보 저장 + FCM 토큰 저장
     private fun saveUserToDatabase(user: FirebaseUser) {
         val userData = mapOf(
             "uid" to user.uid,
@@ -101,14 +99,31 @@ class LoginActivity : AppCompatActivity() {
         database.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
                 Log.d("LoginActivity", "사용자 정보 저장 완료")
+
+                // 🔹 로그인 후 FCM 토큰 저장
+                fetchAndSaveFcmToken(user.uid)
+
                 moveToAddScheduleActivity() // ✅ DB 저장 후 이동
             }
             .addOnFailureListener {
                 Toast.makeText(this, "데이터 저장 실패", Toast.LENGTH_SHORT).show()
             }
+    }
 
-        val database = FirebaseDatabase.getInstance().reference
-        database.child("users").child(user.uid).setValue(userData)
+    // ✅ 🔹 로그인 후 FCM 토큰을 가져와 저장하는 함수 추가
+    private fun fetchAndSaveFcmToken(userId: String) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("LoginActivity", "FCM 토큰 가져오기 실패", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            if (token != null) {
+                database.child("users").child(userId).child("fcmToken").setValue(token)
+                    .addOnSuccessListener { Log.d("LoginActivity", "FCM 토큰 저장 완료") }
+                    .addOnFailureListener { Log.e("LoginActivity", "FCM 토큰 저장 실패", it) }
+            }
+        }
     }
 
     // ✅ 일정 추가 화면으로 이동
@@ -116,6 +131,4 @@ class LoginActivity : AppCompatActivity() {
         startActivity(Intent(this, AddScheduleActivity::class.java))
         finish() // 🔹 로그인 화면 종료
     }
-
-
 }
