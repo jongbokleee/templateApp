@@ -14,8 +14,8 @@ import java.util.*
 class AddScheduleActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddScheduleBinding
-    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() } // 🔹 Firebase 인증 객체
-    private val database by lazy { FirebaseDatabase.getInstance().reference.child("schedules") } // 🔹 Firebase Realtime Database
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val database by lazy { FirebaseDatabase.getInstance().reference.child("schedules") }
 
     private var selectedDate: String? = null
     private var selectedHospital: String? = null
@@ -113,9 +113,10 @@ class AddScheduleActivity : AppCompatActivity() {
                 // setReminderNotification() 호출 → 검진 하루 전 알람 설정
                 setReminderNotification(schedule["date"].toString()) // 🔹 알람 설정
 
-                // ✅ 홈 화면으로 이동
-                val intent = Intent(this, MainActivity::class.java) // 🔹 MainActivity에서 HomeFragment로 이동
-                intent.putExtra("navigateTo", "HomeFragment") // 🔹 프래그먼트 전환을 위한 데이터 전달
+                // ✅ HomeFragment로 이동하며 일정 데이터 전달
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("navigateTo", "HomeFragment")
+                intent.putExtra("newSchedule", scheduleWithUid.toString()) // 🔹 일정 데이터 전달
                 startActivity(intent)
                 finish()
             }
@@ -126,21 +127,20 @@ class AddScheduleActivity : AppCompatActivity() {
 
     // **📌 검진 예약일 하루 전 알림 설정**
     private fun setReminderNotification(selectedDate: String) {
+        if (selectedDate.isEmpty()) return
+
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val selectedCalendar = Calendar.getInstance()
 
         try {
-            val parsedDate = dateFormat.parse(selectedDate)
-            if (parsedDate != null) {
-                selectedCalendar.time = parsedDate
-                selectedCalendar.add(Calendar.DAY_OF_MONTH, -1) // 하루 전 알림
+            val parsedDate = dateFormat.parse(selectedDate) ?: return
+            selectedCalendar.time = parsedDate
+            selectedCalendar.add(Calendar.DAY_OF_MONTH, -1)
 
-                val userId = auth.currentUser?.uid ?: return
-                val timestamp = selectedCalendar.timeInMillis // 예약 하루 전의 타임스탬프
+            val userId = auth.currentUser?.uid ?: return
+            val timestamp = selectedCalendar.timeInMillis
 
-                // ✅ FCM 푸시 알림 전송
-                sendPushNotificationToUser(userId, selectedDate, timestamp)
-            }
+            sendPushNotificationToUser(userId, selectedDate, timestamp)
         } catch (e: Exception) {
             e.printStackTrace()
         }
