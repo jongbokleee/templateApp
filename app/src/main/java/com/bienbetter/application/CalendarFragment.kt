@@ -33,14 +33,4 @@ class CalendarFragment : Fragment() {
             binding.tvSelectedSchedule.text = schedule
         }
     }
-
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//
-//        // 뒤로 가기 버튼 클릭 시 액티비티 종료
-//        binding.backButton.setOnClickListener {
-//            finish()
-//        }
-//    }
-
-
 }
