@@ -19,29 +19,6 @@
         android:background="#1976D2"
         android:padding="12dp"/>
 
-    <!-- 다가오는 건강검진 일정에 관한 데이터 파이어베이스에서 조회해서 추가-->
-    <TextView
-        android:id="@+id/tvUpcomingCheckup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📅 다가오는 건강검진 일정"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="16dp"
-        />
-
-    <TextView
-        android:id="@+id/tvNoSchedules"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="추가된 건강검진 일정이 없습니다"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        android:padding="16dp"/>
-
     <TextView
         android:id="@+id/tvFindHospital"
         android:layout_width="match_parent"
@@ -70,6 +47,29 @@
         android:padding="16dp"
         />
 
+
+    <!-- 다가오는 건강검진 일정에 관한 데이터 파이어베이스에서 조회해서 추가-->
+    <TextView
+        android:id="@+id/tvUpcomingCheckup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="📅 다가오는 건강검진 일정"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        />
+
+    <TextView
+        android:id="@+id/tvNoSchedules"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="추가된 건강검진 일정이 없습니다"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:padding="16dp"/>
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSchedules"
@@ -78,8 +78,6 @@
         android:layout_weight="1"
         android:layout_marginTop="8dp"
         android:padding="8dp"/>
-
-
 
     <TextView
         android:id="@+id/tvLoginRequired"
