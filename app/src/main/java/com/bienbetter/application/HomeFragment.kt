@@ -59,6 +59,13 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // ✅ "건강검진 받을 병원 알아보기" 버튼 클릭 시 병원 검색 화면으로 이동
+        binding.homeBtnFindHospital.setOnClickListener {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            intent.putExtra("navigateTo", "HospitalSearchFragment") // 🔹 HospitalSearchFragment로 이동하도록 설정
+            startActivity(intent)
+        }
+
         // ✅ 로그아웃 버튼 클릭 시 로그아웃 처리
         binding.btnLogout.setOnClickListener {
             logout()
@@ -74,6 +81,15 @@ class HomeFragment : Fragment() {
     // ✅ Firebase에서 일정 데이터 불러오기
     private fun loadSchedulesFromFirebase() {
         val userId = auth.currentUser?.uid ?: return
+
+        // 🔹 로그인이 안 되어 있으면 기본 메시지 표시
+        if (userId == null) {
+            binding.tvUpcomingCheckup.text = "📅 다가오는 건강검진 일정"
+            binding.tvNoSchedules.visibility = View.VISIBLE  // 🔹 추가된 일정 없음 표시
+            binding.recyclerViewSchedules.visibility = View.GONE
+            return
+        }
+
         val databaseRef = database.child(userId)
 
         databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -115,8 +131,13 @@ class HomeFragment : Fragment() {
                     "✔ 다가오는 건강검진 일정: ${it.hospitalName} - ${it.date}"
                 } ?: "📅 다가오는 건강검진 일정"
 
-                binding.tvLoginRequired.visibility =
-                    if (scheduleList.isEmpty()) View.VISIBLE else View.GONE
+                if (scheduleList.isEmpty()) {
+                    binding.tvNoSchedules.visibility = View.VISIBLE
+                    binding.recyclerViewSchedules.visibility = View.GONE
+                } else {
+                    binding.tvNoSchedules.visibility = View.GONE
+                    binding.recyclerViewSchedules.visibility = View.VISIBLE
+                }
 
                 scheduleAdapter.updateList(scheduleList)
             }

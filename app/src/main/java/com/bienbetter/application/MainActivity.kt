@@ -23,6 +23,11 @@ class MainActivity : AppCompatActivity() {
         setupFragments()
 
         val navigateTo = intent.getStringExtra("navigateTo")
+
+        if (navigateTo == "HospitalSearchFragment") {
+            switchFragment(hospitalFragment)
+        }
+
         if (navigateTo == "HomeFragment") {
             switchFragment(homeFragment)
             binding.bottomNavigation.selectedItemId = R.id.nav_home
