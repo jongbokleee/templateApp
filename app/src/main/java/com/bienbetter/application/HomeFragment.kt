@@ -91,6 +91,8 @@ class HomeFragment : Fragment() {
         }
 
         val databaseRef = database.child(userId)
+            .orderByChild("date")  // 날짜 기준으로 정렬
+            .limitToLast(3)  // 🔹 최근 3개 일정만 가져오기
 
         databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -159,6 +161,7 @@ class HomeFragment : Fragment() {
     private fun updateUI(isLoggedIn: Boolean) {
         binding.tvLoginRequired.visibility = if (isLoggedIn) View.GONE else View.VISIBLE
         binding.btnLogout.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+        binding.tvScheduleLimitNotice.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
     }
 
     // ✅ 로그아웃 처리
