@@ -1,33 +1,36 @@
 package com.bienbetter.application.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bienbetter.application.databinding.ItemScheduleBinding
+import com.bienbetter.application.R
+import com.bienbetter.application.model.ScheduleItem
 
-class ScheduleAdapter(private var schedules: List<String>) :
+class ScheduleAdapter(private var scheduleList: List<ScheduleItem>) :
     RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder>() {
 
-    class ScheduleViewHolder(private val binding: ItemScheduleBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(schedule: String) {
-            binding.tvScheduleItem.text = schedule
-        }
+    class ScheduleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val hospitalName: TextView = view.findViewById(R.id.tvHospitalName)
+        val scheduleDate: TextView = view.findViewById(R.id.tvScheduleDate)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScheduleViewHolder {
-        val binding = ItemScheduleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ScheduleViewHolder(binding)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_schedule, parent, false)
+        return ScheduleViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ScheduleViewHolder, position: Int) {
-        holder.bind(schedules[position])
+        val schedule = scheduleList[position]
+        holder.hospitalName.text = schedule.hospitalName
+        holder.scheduleDate.text = schedule.date
     }
 
-    override fun getItemCount(): Int = schedules.size
+    override fun getItemCount(): Int = scheduleList.size
 
-    fun updateList(newSchedules: List<String>) {
-        schedules = newSchedules
+    fun updateList(newList: List<ScheduleItem>) {
+        scheduleList = newList
         notifyDataSetChanged()
     }
 }

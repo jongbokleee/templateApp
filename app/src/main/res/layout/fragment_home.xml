@@ -26,7 +26,12 @@
         android:layout_height="wrap_content"
         android:text="📅 다가오는 건강검진 일정"
         android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        />
 
     <!-- 검진 마감일 알림에 관한 데이터 파이어베이스에서 조회해서 추가-->
     <!-- 마지막 검진 기록에 관한 데이터 파이어베이스에서 조회해서 추가-->

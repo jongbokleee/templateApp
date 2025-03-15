@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:orientation="vertical">
+    android:layout_margin="8dp">
 
-    <TextView
-        android:id="@+id/tvScheduleItem"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:padding="8dp"
-        android:text="검진 일정 정보" />
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:padding="16dp">
 
-</LinearLayout>
+        <!-- 병원 이름 -->
+        <TextView
+            android:id="@+id/tvHospitalName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="병원 이름"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
+
+        <!-- 검진 날짜 -->
+        <TextView
+            android:id="@+id/tvScheduleDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="검진 날짜"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:paddingTop="4dp"/>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
