@@ -1,5 +1,6 @@
 package com.bienbetter.application
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -98,31 +99,42 @@ class AddScheduleActivity : AppCompatActivity() {
         }
     }
 
-    // **📌 Firebase Realtime Database에 일정 저장 (uid 기반 저장)**
     private fun saveScheduleToFirebase(schedule: Map<String, Any?>) {
-        val userId = auth.currentUser?.uid ?: return // 🔹 로그인한 사용자 UID 가져오기
-        val scheduleId = database.child(userId).push().key ?: return // 🔹 UID 하위에 일정 저장
+        val userId = auth.currentUser?.uid ?: return
+        val scheduleId = database.child(userId).push().key ?: return
 
         val scheduleWithUid = schedule.toMutableMap().apply {
-            put("uid", userId) // 🔹 UID 추가
+            put("uid", userId)
         }
 
         database.child(userId).child(scheduleId).setValue(scheduleWithUid)
             .addOnSuccessListener {
                 Toast.makeText(this, "일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
-                // setReminderNotification() 호출 → 검진 하루 전 알람 설정
-                setReminderNotification(schedule["date"].toString()) // 🔹 알람 설정
 
-                // ✅ HomeFragment로 이동하며 일정 데이터 전달
+                // 🔹 1️⃣ 검진 기록을 SharedPreferences에도 저장
+                saveScheduleToSharedPreferences(schedule["date"].toString(), schedule["hospital"].toString())
+
+                // 🔹 2️⃣ HomeFragment로 이동하며 일정 데이터 전달
                 val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("navigateTo", "HomeFragment")
-                intent.putExtra("newSchedule", scheduleWithUid.toString()) // 🔹 일정 데이터 전달
+                intent.putExtra("navigateTo", "HistoryFragment") // ✅ 기록 탭으로 이동
                 startActivity(intent)
                 finish()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "일정 추가 실패: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    // **📌 검진 일정 SharedPreferences에 저장**
+    private fun saveScheduleToSharedPreferences(date: String, hospital: String) {
+        val sharedPreferences = getSharedPreferences("검진기록", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        val savedHistory = sharedPreferences.getStringSet("historyList", mutableSetOf()) ?: mutableSetOf()
+        savedHistory.add("$date - $hospital") // 🔹 예시: "2025-03-15 - 서울적십자병원"
+
+        editor.putStringSet("historyList", savedHistory)
+        editor.apply()
     }
 
     // **📌 검진 예약일 하루 전 알림 설정**
