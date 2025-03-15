@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -10,20 +11,47 @@
         android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="로그인"
+        android:text="건강검진 일정관리"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/white"
         android:gravity="center"
         android:background="#1976D2"
-        android:padding="12dp"/>
+        android:padding="12dp" />
+
+    <!-- 아이콘 -->
+    <TextView
+        android:id="@+id/tvLoginWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="건강검진 알리미 로그인"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#1976D2"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="22dp"
+        android:padding="8dp"/>
+
+
+    <!-- 서브 메시지 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="로그인 후 일정을 추가할 수 있습니다."
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="center"
+        android:padding="3dp"
+        android:layout_gravity="center_horizontal"
+        />
 
     <!-- Google 로그인 버튼 -->
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btnGoogleSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="3dp"
         android:layout_marginBottom="0dp"
+        android:padding="12dp"
         />
 </LinearLayout>
