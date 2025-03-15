@@ -64,15 +64,19 @@ class HospitalSearchFragment : Fragment() {
         )
 
         call.enqueue(object : Callback<HospitalResponse> {
-            override fun onResponse(call: Call<HospitalResponse>, response: Response<HospitalResponse>) {
+            override fun onResponse(
+                call: Call<HospitalResponse>,
+                response: Response<HospitalResponse>
+            ) {
                 Log.d("API_DEBUG", "Response code: ${response.code()}")
 
                 if (response.isSuccessful) {
                     val hospitalResponse = response.body()
 
-                    if (hospitalResponse == null) {
-                        Log.e("API_ERROR", "Response body is null")
-                        hospitalAdapter.updateList(emptyList())  // ✅ body가 null이면 빈 리스트 반환
+                    if (hospitalResponse == null || hospitalResponse.response?.body?.items?.item.isNullOrEmpty()) {
+                        Log.e("API_ERROR", "No hospital data found")
+                        binding.tvNoResults.visibility = View.VISIBLE // ✅ "검색 결과가 없습니다." 표시
+                        binding.recyclerViewHospitals.visibility = View.GONE // ✅ 리스트 숨기기
                         return
                     }
 
@@ -87,17 +91,23 @@ class HospitalSearchFragment : Fragment() {
                     Log.d("API_DEBUG", "Hospitals list size: ${hospitals.size}")
                     hospitalAdapter.updateList(hospitals)
 
+                    // ✅ 데이터가 있으면 "검색 결과 없음" 텍스트를 숨기고 RecyclerView 표시
+                    binding.tvNoResults.visibility = View.GONE
+                    binding.recyclerViewHospitals.visibility = View.VISIBLE
                 } else {
                     Log.e("API_ERROR", "Response failed: ${response.errorBody()?.string()}")
-                    hospitalAdapter.updateList(emptyList())  // ✅ 실패 시 빈 리스트 반환
+                    binding.tvNoResults.visibility = View.VISIBLE // ✅ 실패 시 "검색 결과 없음" 표시
+                    binding.recyclerViewHospitals.visibility = View.GONE // ✅ 리스트 숨기기
+                    hospitalAdapter.updateList(emptyList())
                 }
             }
 
             override fun onFailure(call: Call<HospitalResponse>, t: Throwable) {
                 Log.e("API_ERROR", "Network request failed", t)
-                hospitalAdapter.updateList(emptyList())  // ✅ 네트워크 오류 시 빈 리스트 반환
+                binding.tvNoResults.visibility = View.VISIBLE // ✅ 네트워크 오류 시 "검색 결과 없음" 표시
+                binding.recyclerViewHospitals.visibility = View.GONE // ✅ 리스트 숨기기
+                hospitalAdapter.updateList(emptyList())
             }
         })
     }
-
 }
