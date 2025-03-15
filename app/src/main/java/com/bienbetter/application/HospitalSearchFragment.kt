@@ -8,11 +8,10 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bienbetter.application.adapter.HospitalAdapter
+import com.bienbetter.application.api.RetrofitClient
 import com.bienbetter.application.databinding.FragmentHospitalSearchBinding
 import com.bienbetter.application.model.Hospital
 import com.bienbetter.application.model.HospitalResponse
-import com.bienbetter.application.model.ResponseBody
-import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -58,40 +57,47 @@ class HospitalSearchFragment : Fragment() {
         Log.d("API_DEBUG", "Fetching hospitals with query: $searchQuery")
 
         val call = RetrofitClient.instance.getHospitals(
-            serviceKey = "",  // ✅ 반드시 URL 인코딩된 값 사용
+            serviceKey = "",
             hmcNm = searchQuery,
             siDoCd = 11,
             siGunGuCd = 590
         )
-        call.enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+
+        call.enqueue(object : Callback<HospitalResponse> {
+            override fun onResponse(call: Call<HospitalResponse>, response: Response<HospitalResponse>) {
                 Log.d("API_DEBUG", "Response code: ${response.code()}")
 
-                val rawResponse = response.body()
-                Log.d("API_DEBUG", "Raw Response: $rawResponse")  // ✅ 서버 응답 내용 출력
-
                 if (response.isSuccessful) {
-                    val rawResponse = response.body()
-                    Log.d("API_DEBUG", "Raw Response: $rawResponse")  // ✅ 서버 응답 내용 출력
-//
-//                    val hospitals = response.body()?.response?.body?.items?.item?.map {
-//                        Hospital(it.hmcNm, it.locAddr, it.hmcTelNo)
-//                    } ?: listOf()
-//
-//                    Log.d("API_DEBUG", "Hospitals list size: ${hospitals.size}")
-//                    hospitalAdapter.updateList(hospitals)
+                    val hospitalResponse = response.body()
+
+                    if (hospitalResponse == null) {
+                        Log.e("API_ERROR", "Response body is null")
+                        hospitalAdapter.updateList(emptyList())  // ✅ body가 null이면 빈 리스트 반환
+                        return
+                    }
+
+                    val hospitals = hospitalResponse.response?.body?.items?.item?.map {
+                        Hospital(
+                            it.hmcNm ?: "이름 없음",
+                            it.locAddr ?: "주소 없음",
+                            it.hmcTelNo ?: "전화번호 없음"
+                        )
+                    } ?: emptyList()
+
+                    Log.d("API_DEBUG", "Hospitals list size: ${hospitals.size}")
+                    hospitalAdapter.updateList(hospitals)
+
                 } else {
                     Log.e("API_ERROR", "Response failed: ${response.errorBody()?.string()}")
+                    hospitalAdapter.updateList(emptyList())  // ✅ 실패 시 빈 리스트 반환
                 }
             }
 
-//            override fun onFailure(call: Call<HospitalResponse>, t: Throwable) {
-//                Log.e("API_ERROR", "Network request failed", t)
-//            }
-
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+            override fun onFailure(call: Call<HospitalResponse>, t: Throwable) {
                 Log.e("API_ERROR", "Network request failed", t)
+                hospitalAdapter.updateList(emptyList())  // ✅ 네트워크 오류 시 빈 리스트 반환
             }
         })
     }
+
 }
