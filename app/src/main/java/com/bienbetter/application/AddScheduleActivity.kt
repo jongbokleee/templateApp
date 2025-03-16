@@ -60,6 +60,14 @@ class AddScheduleActivity : AppCompatActivity() {
         }
         binding.spinnerHospital.adapter = adapter
 
+        // ✅ 기존 선택된 병원이 있으면 `setSelection()`으로 UI에 반영
+        selectedHospital?.let { hospital ->
+            val position = hospitalList.indexOf(hospital)
+            if (position >= 0) {
+                binding.spinnerHospital.setSelection(position)
+            }
+        }
+
         binding.spinnerHospital.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                 selectedHospital = hospitalList[position]
