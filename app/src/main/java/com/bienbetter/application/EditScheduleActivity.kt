@@ -2,6 +2,7 @@ package com.bienbetter.application
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -13,6 +14,7 @@ class EditScheduleActivity : AppCompatActivity() {
 
     private lateinit var spinnerHospital: Spinner
     private lateinit var calendarView: CalendarView
+    private lateinit var tvEditedSchedule: TextView
     private lateinit var btnEditSchedule: Button
     private lateinit var backButton: Button
 
@@ -30,6 +32,7 @@ class EditScheduleActivity : AppCompatActivity() {
         // UI 요소 초기화
         spinnerHospital = findViewById(R.id.spinnerHospital)
         calendarView = findViewById(R.id.calendarView)
+        tvEditedSchedule = findViewById(R.id.tvEditedSchedule)
         btnEditSchedule = findViewById(R.id.btnAddSchedule)
         backButton = findViewById(R.id.backButton)
 
@@ -93,6 +96,15 @@ class EditScheduleActivity : AppCompatActivity() {
                     Toast.makeText(this, "병원 목록에서 선택된 병원을 찾을 수 없음", Toast.LENGTH_SHORT).show()
                 }
             }, 100) // 🔹 100ms 지연 (adapter 설정 후 실행)
+
+            // 🔹 병원 선택 시 TextView 업데이트
+            spinnerHospital.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    updateSelectedScheduleText()
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
         }
     }
 
@@ -105,6 +117,12 @@ class EditScheduleActivity : AppCompatActivity() {
                 calendarView.date = date.time // 기존 날짜 선택
             }
         }
+
+        // 🔹 날짜 선택 시 TextView 업데이트
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+            updateSelectedScheduleText()
+        }
     }
 
     // 🔹 기존 데이터를 UI에 반영
@@ -112,6 +130,13 @@ class EditScheduleActivity : AppCompatActivity() {
         selectedDate?.let {
             Toast.makeText(this, "수정할 일정: $it, 병원: $selectedHospital", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    // 🔹 선택된 일정 정보를 TextView에 업데이트
+    private fun updateSelectedScheduleText() {
+        val newHospital = spinnerHospital.selectedItem.toString()
+        val newDate = selectedDate ?: "날짜 없음"
+        tvEditedSchedule.text = "$newHospital | $newDate"
     }
 
     // 🔹 Firebase 일정 업데이트

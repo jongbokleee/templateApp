@@ -61,6 +61,19 @@
         android:theme="@style/CalendarStyle"
         />
 
+    <!-- 선택된 일정 -->
+    <TextView
+        android:id="@+id/tvEditedSchedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        android:text="선택된 일정이 없습니다."
+        android:background="#E3F2FD"
+        android:gravity="center"
+        android:layout_marginTop="16dp"/>
+
     <Button
         android:id="@+id/btnAddSchedule"
         android:layout_width="match_parent"
