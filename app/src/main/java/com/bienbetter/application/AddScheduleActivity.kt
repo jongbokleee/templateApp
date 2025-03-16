@@ -40,7 +40,7 @@ class AddScheduleActivity : AppCompatActivity() {
 
     // ✅ 병원 선택 스피너 설정
     private fun setupHospitalSpinner() {
-        val hospitalList = listOf("서울 중앙병원", "부산 시민병원", "대구 메디컬센터", "광주 한마음병원", "대전 건강센터")
+        val hospitalList = listOf("중앙대학교병원", "청화병원", "정동병원", "경성의원", "서울가정의원")
         val adapter = object : ArrayAdapter<String>(
             this,
             android.R.layout.simple_spinner_dropdown_item,
