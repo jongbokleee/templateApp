@@ -13,6 +13,8 @@ import com.bienbetter.application.databinding.FragmentHistoryBinding
 import com.bienbetter.application.model.HistoryItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
+import java.util.*
 
 class HistoryFragment : Fragment() {
 
@@ -72,6 +74,10 @@ class HistoryFragment : Fragment() {
                         historyList.add(HistoryItem(historyText))
                     }
                 }
+
+                // ✅ 최신 날짜가 먼저 나오도록 정렬 (내림차순)
+                historyList.sortByDescending { parseDate(it.text) }
+
                 historyAdapter.notifyDataSetChanged() // ✅ RecyclerView 갱신
             }
         }.addOnFailureListener {
@@ -79,5 +85,13 @@ class HistoryFragment : Fragment() {
         }
     }
 
-
+    // 🔹 날짜를 비교하기 위해 문자열을 Date 객체로 변환하는 함수
+    private fun parseDate(dateString: String): Date {
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            sdf.parse(dateString.split(" - ")[0]) ?: Date()
+        } catch (e: Exception) {
+            Date()
+        }
+    }
 }
