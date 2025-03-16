@@ -98,6 +98,15 @@ class HomeFragment : Fragment() {
                     scheduleList.add(scheduleItem)
                 }
 
+                // ✅ 로그인 상태일 때 "추가된 일정 없음" 문구 숨기기
+                if (scheduleList.isNotEmpty()) {
+                    binding.tvNoSchedules.visibility = View.GONE
+                    binding.recyclerViewSchedules.visibility = View.VISIBLE
+                } else {
+                    binding.tvNoSchedules.visibility = View.VISIBLE
+                    binding.recyclerViewSchedules.visibility = View.GONE
+                }
+
                 // 🔹 RecyclerView 갱신
                 scheduleAdapter.updateList(scheduleList)
             }
