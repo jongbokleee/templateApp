@@ -50,6 +50,10 @@ class HistoryFragment : Fragment() {
     // 📌 기록 데이터 로드 (기본값 + 저장된 일정 불러오기)
     private fun loadHistoryData() {
         val sharedPreferences = requireContext().getSharedPreferences("검진기록", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear() // ✅ SharedPreferences 데이터 초기화
+        editor.apply()
+
         val savedHistory = sharedPreferences.getStringSet("historyList", setOf()) ?: setOf()
 
         historyList.clear() // ✅ 기존 데이터 초기화 (중복 방지)
