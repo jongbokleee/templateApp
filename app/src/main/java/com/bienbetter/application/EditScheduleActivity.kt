@@ -144,9 +144,14 @@ class EditScheduleActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: return
         val newHospital = spinnerHospital.selectedItem.toString()
 
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = calendarView.date
-        val newDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+        // ✅ 최신 날짜를 `selectedDate`에서 가져옴
+        if (selectedDate == null) {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = calendarView.date
+            selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+        }
+
+        val newDate = selectedDate ?: return
 
         if (scheduleKey == null) {
             Toast.makeText(this, "일정 정보를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
@@ -162,6 +167,7 @@ class EditScheduleActivity : AppCompatActivity() {
         database.child(userId).child(scheduleKey!!).updateChildren(updateData)
             .addOnSuccessListener {
                 Toast.makeText(this, "일정이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+                updateSelectedScheduleText() // ✅ 변경된 값 UI에 반영
                 finish()
             }
             .addOnFailureListener {
