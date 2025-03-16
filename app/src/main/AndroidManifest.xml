@@ -27,6 +27,7 @@
 
         <activity android:name=".MainActivity" android:exported="true" />
         <activity android:name=".AddScheduleActivity" android:exported="true" />
+        <activity android:name=".EditScheduleActivity" android:exported="true" />
         <activity android:name=".LoginActivity" android:exported="true" />
 
         <!-- ✅ Firebase Cloud Messaging 서비스 -->

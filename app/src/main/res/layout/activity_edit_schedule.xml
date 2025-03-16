@@ -13,7 +13,7 @@
         android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="건강검진 일정관리 추가"
+        android:text="건강검진 일정관리 수정"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
@@ -25,7 +25,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🏥 검진 받을 병원 선택"
+        android:text="🏥 검진 받을 병원 변경"
         android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -46,7 +46,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="⏳ 검진 예약 일정 추가"
+        android:text="⏳ 검진 예약 일정 변경"
         android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -65,7 +65,7 @@
         android:id="@+id/btnAddSchedule"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="일정 추가하기"
+        android:text="수정하기"
         android:textColor="#FFFFFF"
         android:backgroundTint="#1976D2"
         android:layout_marginTop="16dp"/>

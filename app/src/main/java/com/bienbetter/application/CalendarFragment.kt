@@ -1,5 +1,6 @@
 package com.bienbetter.application
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -43,6 +44,35 @@ class CalendarFragment : Fragment() {
 
         // ✅ HomeFragment에서 선택한 날짜를 받아 저장
         selectedDate = arguments?.getString("selected_date")
+
+        // ✅ "수정하기" 버튼 클릭 시 EditScheduleActivity로 이동
+        binding.btnEditSchedule.setOnClickListener {
+            val selectedDateStr = binding.tvSelectedSchedule.text.toString().split("|")[1].trim() // 날짜 추출
+            val selectedHospital = binding.tvSelectedSchedule.text.toString().split("|")[0].trim() // 병원 추출
+
+            // 🔹 Firebase에서 해당 일정의 키 가져오기
+            val userId = auth.currentUser?.uid ?: return@setOnClickListener
+            database.child(userId).orderByChild("date").equalTo(selectedDateStr)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (child in snapshot.children) {
+                            val scheduleKey = child.key // 🔹 Firebase의 해당 일정 키 가져오기
+
+                            val intent = Intent(requireContext(), EditScheduleActivity::class.java).apply {
+                                putExtra("selected_date", selectedDateStr)
+                                putExtra("selected_hospital", selectedHospital)
+                                putExtra("schedule_key", scheduleKey)
+                            }
+                            startActivity(intent)
+                            break // 한 개만 수정하면 되므로 루프 종료
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(requireContext(), "일정 정보를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                })
+        }
     }
 
     // ✅ 캘린더 설정 (월 제목 및 요일 표시)
