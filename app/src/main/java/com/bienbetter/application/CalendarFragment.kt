@@ -75,6 +75,11 @@ class CalendarFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadSchedulesFromFirebase() // ✅ 캘린더 화면으로 돌아올 때 데이터를 새로 불러오기
+    }
+
     // ✅ 캘린더 설정 (월 제목 및 요일 표시)
     private fun setupCalendarView() {
         binding.calendarView.state().edit()
