@@ -82,21 +82,25 @@ class HomeFragment : Fragment() {
     private fun loadSchedulesFromFirebase() {
         val userId = auth.currentUser?.uid ?: return
 
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val todayDate = sdf.format(Date()) // 📌 오늘 날짜 (예: 2025-03-16)
+
         val databaseRef = database.child(userId)
             .orderByChild("date")
-            .limitToLast(3) // 🔹 최근 3개 일정만 가져오기
+            .startAt(todayDate)
 
         databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                scheduleList.clear()
-
+                val tempList = mutableListOf<ScheduleItem>()
                 for (child in snapshot.children) {
                     val hospital = child.child("hospital").getValue(String::class.java) ?: "알 수 없음"
                     val dateStr = child.child("date").getValue(String::class.java) ?: "날짜 없음"
 
-                    val scheduleItem = ScheduleItem.create(hospital, dateStr)
-                    scheduleList.add(scheduleItem)
+                    tempList.add(ScheduleItem.create(hospital, dateStr))
                 }
+
+                scheduleList.clear()
+                scheduleList.addAll(tempList.sortedBy { it.date }.take(3))
 
                 // ✅ 로그인 상태일 때 "추가된 일정 없음" 문구 숨기기
                 if (scheduleList.isNotEmpty()) {

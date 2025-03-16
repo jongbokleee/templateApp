@@ -72,7 +72,12 @@ class AddScheduleActivity : AppCompatActivity() {
     // ✅ 캘린더 선택 기능 추가
     private fun setupCalendar() {
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            selectedDate = "$year-${month + 1}-$dayOfMonth"
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // ✅ 형식 통일
+            selectedDate = sdf.format(calendar.time) // ✅ 날짜를 'yyyy-MM-dd' 형식으로 저장
+
             Toast.makeText(this, "선택한 날짜: $selectedDate", Toast.LENGTH_SHORT).show()
         }
     }
