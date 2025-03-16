@@ -47,7 +47,7 @@
         android:layout_height="wrap_content"
         android:text="계정 탈퇴"
         android:textColor="#FFFFFF"
-        android:backgroundTint="#FF0000"
+        android:backgroundTint="#1976D2"
         android:layout_marginTop="10dp"
         android:padding="16dp"
         />

@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:text="검진 일정 추가하기"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#1976D2"
+            android:backgroundTint="#90CAF9"
             android:layout_marginBottom="8dp"/>
 
         <Button
@@ -126,7 +126,7 @@
             android:layout_height="wrap_content"
             android:text="로그아웃"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#FF0000"
+            android:backgroundTint="#1976D2"
            />
     </LinearLayout>
 </LinearLayout>
