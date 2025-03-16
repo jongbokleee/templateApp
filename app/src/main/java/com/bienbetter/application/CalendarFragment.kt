@@ -75,7 +75,7 @@ class CalendarFragment : Fragment() {
 
         // ✅ 날짜 선택 시 일정 표시
         binding.calendarView.setOnDateChangedListener { _, date, _ ->
-            val selectedDateStr = formatDate("${date.year}-${date.month + 1}-${date.day}")
+            val selectedDateStr = formatDate("${date.year}-${date.month}-${date.day}") // month에 +1 하면 안 됨
             binding.tvSelectedSchedule.text = scheduleMap[selectedDateStr] ?: "선택된 일정이 없습니다."
         }
     }
@@ -100,7 +100,7 @@ class CalendarFragment : Fragment() {
                 }
 
                 // ✅ 일정이 있는 날짜에 원(DotSpan) 추가
-                binding.calendarView.addDecorator(EventDecorator(Color.BLUE, scheduleDates))
+                binding.calendarView.addDecorator(EventDecorator(Color.RED, scheduleDates))
 
                 // ✅ HomeFragment에서 넘어온 날짜를 캘린더에 반영 (Firebase 데이터 로딩 후)
                 selectedDate?.let { date ->
@@ -141,7 +141,7 @@ class CalendarFragment : Fragment() {
                 calendar.time = it
                 return CalendarDay.from(
                     calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH), // ✅ `+1` 제거 (MaterialCalendarView는 0부터 시작)
+                    calendar.get(Calendar.MONTH)+1, // +1 제거하면 안 됨 ✅
                     calendar.get(Calendar.DAY_OF_MONTH)
                 )
             }
