@@ -104,8 +104,7 @@
     <!-- ✅ 하단 버튼들을 LinearLayout으로 묶어 고정 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_height="wrap_content"
         android:gravity="bottom"
         android:orientation="vertical"
         android:paddingTop="0dp"
