@@ -9,4 +9,5 @@
     <color name="blue">#1976D2</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green">#4CAF50</color>
+    <color name="light_gray">#F0F0F0</color> <!-- 버튼 색상 (연한 회색) -->
 </resources>

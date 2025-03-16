@@ -29,23 +29,23 @@
         android:textColor="@android:color/black"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingTop="16dp"
+        android:paddingTop="25dp"
         />
 
     <Button
         android:id="@+id/homeBtnFindHospital"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="병원 찾기 화면으로 이동"
-        android:drawableStart="@drawable/ic_arrow_right"
-        android:textColor="#808080"
-        android:background="@android:color/white"
         android:gravity="start"
         android:textSize="14sp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"
-        android:padding="16dp"
-        />
+        android:textColor="@android:color/darker_gray"
+        android:background="@drawable/rounded_button"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:elevation="4dp"
+        android:padding="12dp"/>
 
 
     <!-- 다가오는 건강검진 일정에 관한 데이터 파이어베이스에서 조회해서 추가-->
@@ -66,10 +66,12 @@
         android:id="@+id/tvScheduleLimitNotice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingStart="16dp"
         android:text="※ 최근 3개의 건강검진 일정만 표시됩니다."
         android:textSize="12sp"
         android:textColor="@android:color/darker_gray"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
         android:visibility="gone"/>  <!-- 기본적으로 숨김 -->
 
     <TextView
