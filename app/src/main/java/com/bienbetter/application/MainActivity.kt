@@ -22,6 +22,12 @@ class MainActivity : AppCompatActivity() {
 
         setupFragments()
 
+        // ✅ 일정 클릭 시 이동하는 경우 selected_date 전달
+        val selectedDate = intent.getStringExtra("selected_date")
+        if (selectedDate != null) {
+            switchToCalendarWithDate(selectedDate)
+        }
+
         val navigateTo = intent.getStringExtra("navigateTo")
 
         if (navigateTo == "HospitalSearchFragment") {
@@ -70,5 +76,15 @@ class MainActivity : AppCompatActivity() {
                 .commit()
             activeFragment = targetFragment
         }
+    }
+
+    // ✅ `CalendarFragment`로 이동하면서 선택한 날짜 전달
+    private fun switchToCalendarWithDate(selectedDate: String) {
+        val bundle = Bundle()
+        bundle.putString("selected_date", selectedDate)
+        calendarFragment.arguments = bundle
+
+        switchFragment(calendarFragment) // ✅ `CalendarFragment` 활성화
+        binding.bottomNavigation.selectedItemId = R.id.nav_calendar // ✅ 하단 네비게이션 변경
     }
 }

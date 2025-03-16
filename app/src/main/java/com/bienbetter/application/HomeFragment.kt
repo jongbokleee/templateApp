@@ -62,7 +62,7 @@ class HomeFragment : Fragment() {
         // ✅ "건강검진 받을 병원 알아보기" 버튼 클릭 시 병원 검색 화면으로 이동
         binding.homeBtnFindHospital.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
-            intent.putExtra("navigateTo", "HospitalSearchFragment") // 🔹 HospitalSearchFragment로 이동하도록 설정
+            intent.putExtra("navigateTo", "HospitalSearchFragment")
             startActivity(intent)
         }
 
@@ -82,65 +82,23 @@ class HomeFragment : Fragment() {
     private fun loadSchedulesFromFirebase() {
         val userId = auth.currentUser?.uid ?: return
 
-        // 🔹 로그인이 안 되어 있으면 기본 메시지 표시
-        if (userId == null) {
-            binding.tvUpcomingCheckup.text = "📅 다가오는 건강검진 일정"
-            binding.tvNoSchedules.visibility = View.VISIBLE  // 🔹 추가된 일정 없음 표시
-            binding.recyclerViewSchedules.visibility = View.GONE
-            return
-        }
-
         val databaseRef = database.child(userId)
-            .orderByChild("date")  // 날짜 기준으로 정렬
-            .limitToLast(3)  // 🔹 최근 3개 일정만 가져오기
+            .orderByChild("date")
+            .limitToLast(3) // 🔹 최근 3개 일정만 가져오기
 
         databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 scheduleList.clear()
 
-                var upcomingCheckup: ScheduleItem? = null
-                var lastCheckup: ScheduleItem? = null
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val currentDate = System.currentTimeMillis()
-
                 for (child in snapshot.children) {
                     val hospital = child.child("hospital").getValue(String::class.java) ?: "알 수 없음"
                     val dateStr = child.child("date").getValue(String::class.java) ?: "날짜 없음"
 
-                    val dateTimestamp = try {
-                        dateFormat.parse(dateStr)?.time ?: 0L
-                    } catch (e: Exception) {
-                        0L
-                    }
-
-                    val scheduleItem = ScheduleItem(hospital, dateStr, dateTimestamp)
+                    val scheduleItem = ScheduleItem.create(hospital, dateStr)
                     scheduleList.add(scheduleItem)
-
-                    // 🔹 최신 일정 찾기
-                    if (dateTimestamp >= currentDate) {
-                        if (upcomingCheckup == null || dateTimestamp < upcomingCheckup.dateTimestamp) {
-                            upcomingCheckup = scheduleItem
-                        }
-                    } else {
-                        if (lastCheckup == null || dateTimestamp > lastCheckup.dateTimestamp) {
-                            lastCheckup = scheduleItem
-                        }
-                    }
                 }
 
-                // 🔹 UI에 최신 일정 반영
-                binding.tvUpcomingCheckup.text = upcomingCheckup?.let {
-                    "✔ 다가오는 건강검진 일정: ${it.hospitalName} - ${it.date}"
-                } ?: "📅 다가오는 건강검진 일정"
-
-                if (scheduleList.isEmpty()) {
-                    binding.tvNoSchedules.visibility = View.VISIBLE
-                    binding.recyclerViewSchedules.visibility = View.GONE
-                } else {
-                    binding.tvNoSchedules.visibility = View.GONE
-                    binding.recyclerViewSchedules.visibility = View.VISIBLE
-                }
-
+                // 🔹 RecyclerView 갱신
                 scheduleAdapter.updateList(scheduleList)
             }
 
@@ -152,7 +110,7 @@ class HomeFragment : Fragment() {
 
     // ✅ RecyclerView 설정
     private fun setupRecyclerView() {
-        scheduleAdapter = ScheduleAdapter(scheduleList)
+        scheduleAdapter = ScheduleAdapter(requireActivity(), scheduleList)
         binding.recyclerViewSchedules.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewSchedules.adapter = scheduleAdapter
     }

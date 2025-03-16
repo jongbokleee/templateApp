@@ -39,6 +39,15 @@ class CalendarFragment : Fragment() {
 
         setupCalendarView() // ✅ 캘린더 설정
         loadSchedulesFromFirebase() // 🔹 Firebase에서 일정 불러오기
+
+        // ✅ HomeFragment에서 선택한 날짜(`selected_date`)를 받아서 캘린더에 반영
+        arguments?.getString("selected_date")?.let { date ->
+            val parsedDate = parseDateToCalendarDay(date)
+            parsedDate?.let {
+                binding.calendarView.setDateSelected(it, true) // ✅ 선택한 날짜 강조
+                binding.calendarView.currentDate = it // ✅ 캘린더 이동
+            }
+        }
     }
 
     // ✅ 캘린더 설정 (월 제목 및 요일 표시)
