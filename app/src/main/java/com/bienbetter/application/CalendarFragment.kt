@@ -76,7 +76,16 @@ class CalendarFragment : Fragment() {
         // ✅ 날짜 선택 시 일정 표시
         binding.calendarView.setOnDateChangedListener { _, date, _ ->
             val selectedDateStr = formatDate("${date.year}-${date.month}-${date.day}") // month에 +1 하면 안 됨
-            binding.tvSelectedSchedule.text = scheduleMap[selectedDateStr] ?: "선택된 일정이 없습니다."
+            val scheduleText = scheduleMap[selectedDateStr] ?: "선택된 일정이 없습니다."
+
+            binding.tvSelectedSchedule.text = scheduleText
+
+            // ✅ 선택된 날짜에 일정이 있는 경우 버튼 보이기, 없으면 숨기기
+            if (scheduleMap.containsKey(selectedDateStr)) {
+                binding.btnEditSchedule.visibility = View.VISIBLE
+            } else {
+                binding.btnEditSchedule.visibility = View.GONE
+            }
         }
     }
 
