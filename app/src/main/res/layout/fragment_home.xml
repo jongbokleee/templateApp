@@ -59,7 +59,7 @@
         android:textColor="@android:color/black"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingTop="16dp"
+        android:paddingTop="25dp"
         />
 
     <TextView
