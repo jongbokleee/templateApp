@@ -87,7 +87,7 @@
         android:id="@+id/recyclerViewSchedules"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="6"
         android:layout_marginTop="8dp"
         android:padding="8dp"/>
 
@@ -101,23 +101,32 @@
         android:gravity="center"
         android:visibility="visible"/>
 
-    <Button
-        android:id="@+id/homeBtnAddSchedule"
+    <!-- ✅ 하단 버튼들을 LinearLayout으로 묶어 고정 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="검진 일정 추가하기"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#1976D2"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:paddingTop="0dp"
+        android:paddingEnd="8dp">
 
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="로그아웃"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#FF0000"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"/>
+        <Button
+            android:id="@+id/homeBtnAddSchedule"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="검진 일정 추가하기"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#1976D2"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="로그아웃"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#FF0000"
+           />
+    </LinearLayout>
 </LinearLayout>
