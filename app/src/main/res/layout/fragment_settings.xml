@@ -26,13 +26,19 @@
         android:text="푸시 알림 설정"
         android:textSize="16sp"
         android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        />
 
     <Switch
         android:id="@+id/switchPushNotifications"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:padding="16dp"
+        android:thumbTint="@color/light_gray"
+        android:trackTint="@color/black"
+        />
 
     <!-- 계정 탈퇴 버튼 -->
     <Button
@@ -42,6 +48,7 @@
         android:text="계정 탈퇴"
         android:textColor="#FFFFFF"
         android:backgroundTint="#FF0000"
-        android:layout_marginTop="32dp"/>
-
+        android:layout_marginTop="10dp"
+        android:padding="16dp"
+        />
 </LinearLayout>
