@@ -91,16 +91,6 @@
         android:layout_marginTop="8dp"
         android:padding="8dp"/>
 
-    <TextView
-        android:id="@+id/tvLoginRequired"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="일정 추가는 로그인 후 가능합니다."
-        android:textSize="14sp"
-        android:textColor="#808080"
-        android:gravity="center"
-        android:visibility="visible"/>
-
     <!-- ✅ 하단 버튼들을 LinearLayout으로 묶어 고정 -->
     <LinearLayout
         android:layout_width="match_parent"

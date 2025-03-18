@@ -37,10 +37,43 @@ class LoginActivity : AppCompatActivity() {
             moveToAddScheduleActivity()
         }
 
-        // ✅ 1 로그인 버튼 클릭 시 Google 로그인 실행
+        // ✅ 1. Google 로그인 버튼
         binding.btnGoogleSignIn.setOnClickListener {
             signInWithGoogle()
         }
+
+        // ✅ 2. 일반 로그인 버튼 추가
+        binding.btnLogin.setOnClickListener {
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+            loginWithEmail(email, password)
+        }
+
+        // ✅ 3. 회원가입 버튼 (RegisterActivity로 이동)
+        binding.btnJoin.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
+    }
+
+    // ✅ 4. 이메일 로그인 기능 추가
+    private fun loginWithEmail(email: String, password: String) {
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "이메일과 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    if (user != null) {
+                        fetchAndSaveFcmToken(user.uid) // ✅ 로그인 후 FCM 토큰 저장
+                        moveToAddScheduleActivity()
+                    }
+                } else {
+                    Toast.makeText(this, "로그인 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     // ✅ 2 구글 로그인 요청
@@ -56,7 +89,7 @@ class LoginActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    // ✅ 3 로그인 결과 처리
+    // ✅ 3 구글 로그인 결과 처리
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

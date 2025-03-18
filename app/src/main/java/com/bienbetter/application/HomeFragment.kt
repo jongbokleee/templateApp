@@ -130,7 +130,6 @@ class HomeFragment : Fragment() {
 
     // ✅ 로그인 상태에 따라 UI 업데이트
     private fun updateUI(isLoggedIn: Boolean) {
-        binding.tvLoginRequired.visibility = if (isLoggedIn) View.GONE else View.VISIBLE
         binding.btnLogout.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
         binding.tvScheduleLimitNotice.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
     }
