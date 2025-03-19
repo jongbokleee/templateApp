@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">건강검진 알리미</string>
+    <string-array name="search_options">
+        <item>병원명</item>
+        <item>지역</item>
+    </string-array>
     <string name="hospital_prompt">병원 선택</string>
     <string name="default_web_client_id">YOUR_WEB_CLIENT_ID</string>
 </resources>

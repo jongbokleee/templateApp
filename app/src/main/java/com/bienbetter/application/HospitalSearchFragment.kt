@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.util.Log
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bienbetter.application.adapter.HospitalAdapter
@@ -37,28 +38,47 @@ class HospitalSearchFragment : Fragment() {
         binding.recyclerViewHospitals.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewHospitals.adapter = hospitalAdapter
 
+        // ✅ 스피너 어댑터 설정
+        val spinnerItems = resources.getStringArray(R.array.search_options)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, spinnerItems)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        binding.spinnerSearchType.adapter = adapter // 스피너에 어댑터 적용
+
         // ✅ Fragment가 처음 열릴 때 기본 병원 리스트 불러오기
-        fetchHospitals("")
+        fetchHospitals("", "")
 
         // ✅ 검색 버튼 클릭 시 검색 실행
         binding.btnSearch.setOnClickListener {
             val searchQuery = binding.etSearch.text.toString().trim()
+            val searchType = binding.spinnerSearchType.selectedItem.toString() // 스피너 선택 값 가져오기
 
-            if (searchQuery.isNotEmpty()) {
-                Log.d("API_DEBUG", "Search button clicked, query: $searchQuery")
-                fetchHospitals(searchQuery)
-            } else {
-                Log.d("API_DEBUG", "검색어가 비어있음")
+            when {
+                searchQuery.isNotEmpty() -> { // ✅ 검색어가 있을 때
+                    if (searchType == "병원명") {
+                        Log.d("API_DEBUG", "병원명 검색 실행: $searchQuery")
+                        fetchHospitals(hospitalName = searchQuery, location = "")
+                    } else {
+                        Log.d("API_DEBUG", "지역 검색 실행: $searchQuery")
+                        fetchHospitals(hospitalName = "", location = searchQuery)
+                    }
+                }
+
+                else -> { // ✅ 검색어가 비어있을 때 전체 병원 리스트 가져오기
+                    Log.d("API_DEBUG", "검색어가 비어 있음, 전체 병원 리스트 조회")
+                    fetchHospitals("", "") // 병원명과 지역 모두 빈 문자열로 API 요청
+                }
             }
         }
     }
 
-    private fun fetchHospitals(searchQuery: String) {
-        Log.d("API_DEBUG", "Fetching hospitals with query: $searchQuery")
+    private fun fetchHospitals(hospitalName: String, location: String) {
+        Log.d("API_DEBUG", "Fetching hospitals with hospitalName: $hospitalName, location: $location")
 
         val call = RetrofitClient.instance.getHospitals(
             serviceKey = "",
-            hmcNm = searchQuery,
+            hmcNm = hospitalName, // 병원명 검색어
+            locAddr = location, // 지역명 검색어
             siDoCd = 11,
             siGunGuCd = 590
         )
