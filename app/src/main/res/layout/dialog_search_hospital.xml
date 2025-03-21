@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 시도 선택 -->
+    <Spinner
+        android:id="@+id/spinnerCity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"/>
+
+    <!-- 시군구 선택 -->
+    <Spinner
+        android:id="@+id/spinnerDistrict"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"/>
+
+    <!-- 병원 검색 입력 -->
+    <EditText
+        android:id="@+id/etHospitalSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="병원명 입력 후 검색"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:background="@android:drawable/edit_text"
+        android:layout_marginTop="8dp"/>
+
+    <!-- 검색 버튼 -->
+    <Button
+        android:id="@+id/btnSearchHospital"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🔍 검색"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>

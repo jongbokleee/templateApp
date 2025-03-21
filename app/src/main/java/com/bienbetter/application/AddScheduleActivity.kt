@@ -1,6 +1,7 @@
 package com.bienbetter.application
 
-import android.content.Intent
+import android.app.AlertDialog
+import android.view.LayoutInflater
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -15,8 +16,7 @@ class AddScheduleActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddScheduleBinding
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
-    private val database by lazy { FirebaseDatabase.getInstance().reference.child("hospitals") }
-
+    private val database by lazy { FirebaseDatabase.getInstance().reference }
     private var selectedDate: String? = null
     private var selectedHospital: String? = null
     private var selectedCityCode: String? = null
@@ -27,116 +27,11 @@ class AddScheduleActivity : AppCompatActivity() {
         binding = ActivityAddScheduleBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupCitySpinner()
         setupCalendar()
-        setupButtons()
 
-        binding.backButton.setOnClickListener { finish() }
-    }
-
-    // ✅ `hospitals` 하위 데이터에서 시도(광역시/도) 목록 불러오기
-    private fun setupCitySpinner() {
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val cityMap = mutableMapOf<String, String>()
-                val cityNames = mutableListOf<String>()
-
-                for (child in snapshot.children) {
-                    val cityCode = child.key ?: continue
-                    cityMap[cityCode] = cityCode // 예: "11", "41"
-                    cityNames.add(cityCode)
-                }
-
-                updateCitySpinner(cityNames, cityMap)
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
-    // ✅ 시도(광역시/도) 스피너 업데이트
-    private fun updateCitySpinner(cityNames: List<String>, cityMap: Map<String, String>) {
-        val cityAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, cityNames)
-        binding.spinnerCity.adapter = cityAdapter
-
-        binding.spinnerCity.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedCityCode = cityMap[cityNames[position]]
-                selectedCityCode?.let { loadDistricts(it) }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-    }
-
-    // ✅ `hospitals > {시도코드}` 하위에서 시군구 목록 불러오기
-    private fun loadDistricts(cityCode: String) {
-        database.child(cityCode).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val districtMap = mutableMapOf<String, String>()
-                val districtNames = mutableListOf<String>()
-
-                for (child in snapshot.children) {
-                    val districtCode = child.key ?: continue
-                    districtMap[districtCode] = districtCode // 예: "110", "140"
-                    districtNames.add(districtCode)
-                }
-
-                updateDistrictSpinner(districtNames, districtMap)
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
-    // ✅ 시군구 스피너 업데이트
-    private fun updateDistrictSpinner(districtNames: List<String>, districtMap: Map<String, String>) {
-        val districtAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, districtNames)
-        binding.spinnerDistrict.adapter = districtAdapter
-
-        binding.spinnerDistrict.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedDistrictCode = districtMap[districtNames[position]]
-                selectedCityCode?.let { cityCode ->
-                    selectedDistrictCode?.let { districtCode ->
-                        loadHospitals(cityCode, districtCode)
-                    }
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-    }
-
-    // ✅ `hospitals > {시도코드} > {시군구코드}` 하위에서 병원 목록 불러오기
-    private fun loadHospitals(cityCode: String, districtCode: String) {
-        database.child(cityCode).child(districtCode).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val hospitalNames = mutableListOf<String>()
-
-                for (child in snapshot.children) {
-                    val hospitalName = child.child("name").getValue(String::class.java) ?: continue
-                    hospitalNames.add(hospitalName)
-                }
-
-                updateHospitalSpinner(hospitalNames)
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
-    // ✅ 병원 스피너 업데이트
-    private fun updateHospitalSpinner(hospitalNames: List<String>) {
-        val hospitalAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, hospitalNames)
-        binding.spinnerHospital.adapter = hospitalAdapter
-
-        binding.spinnerHospital.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                selectedHospital = hospitalNames[position]
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        // 🔹 검색 버튼 클릭 시 팝업 실행
+        binding.btnSearch.setOnClickListener {
+            showSearchPopup()
         }
     }
 
@@ -153,38 +48,140 @@ class AddScheduleActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ 버튼 클릭 리스너 설정
-    private fun setupButtons() {
-        binding.btnAddSchedule.setOnClickListener {
-            if (selectedHospital.isNullOrEmpty() || selectedDate.isNullOrEmpty()) {
-                Toast.makeText(this, "모든 정보를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+    // ✅ 병원 검색 팝업 표시
+    private fun showSearchPopup() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_search_hospital, null)
+        val citySpinner = dialogView.findViewById<Spinner>(R.id.spinnerCity)
+        val districtSpinner = dialogView.findViewById<Spinner>(R.id.spinnerDistrict)
+        val etSearch = dialogView.findViewById<EditText>(R.id.etHospitalSearch)
+        val btnSearchHospital = dialogView.findViewById<Button>(R.id.btnSearchHospital)
+
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogView)
+        builder.setTitle("병원 검색")
+        val dialog = builder.create()
+
+        loadCitySpinner(citySpinner, districtSpinner)
+
+        // 🔹 병원 검색 버튼 클릭 시 실행
+        btnSearchHospital.setOnClickListener {
+            val searchQuery = etSearch.text.toString().trim()
+            if (searchQuery.isNotEmpty()) {
+                searchHospitals(searchQuery, citySpinner, districtSpinner, dialog)
+            } else {
+                Toast.makeText(this, "검색어를 입력하세요", Toast.LENGTH_SHORT).show()
             }
-
-            val newSchedule = mapOf(
-                "hospital" to selectedHospital,
-                "date" to selectedDate,
-                "userId" to auth.currentUser?.uid
-            )
-
-            saveScheduleToFirebase(newSchedule)
         }
+
+        dialog.show()
     }
 
-    private fun saveScheduleToFirebase(schedule: Map<String, Any?>) {
-        val userId = auth.currentUser?.uid ?: return
-        val scheduleId = FirebaseDatabase.getInstance().reference.child("schedules").child(userId).push().key ?: return
+    // ✅ Firebase에서 시도(광역시/도) 목록 가져오기
+    private fun loadCitySpinner(citySpinner: Spinner, districtSpinner: Spinner) {
+        val cityRef = database.child("hospitals")
 
-        FirebaseDatabase.getInstance().reference.child("schedules").child(userId).child(scheduleId).setValue(schedule)
-            .addOnSuccessListener {
-                Toast.makeText(this, "일정이 추가되었습니다.", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainActivity::class.java).apply {
-                    putExtra("navigateTo", "HistoryFragment")
-                })
-                finish()
+        cityRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val cityMap = mutableMapOf<String, String>()
+                val cityNames = mutableListOf<String>()
+
+                for (child in snapshot.children) {
+                    val cityCode = child.key ?: continue
+                    cityMap[cityCode] = cityCode
+                    cityNames.add(cityCode)
+                }
+
+                val cityAdapter = ArrayAdapter(this@AddScheduleActivity, android.R.layout.simple_spinner_dropdown_item, cityNames)
+                citySpinner.adapter = cityAdapter
+
+                citySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        selectedCityCode = cityMap[cityNames[position]]
+                        selectedCityCode?.let { loadDistrictSpinner(it, districtSpinner) }
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "일정 추가 실패: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    // ✅ Firebase에서 시군구 목록 가져오기
+    private fun loadDistrictSpinner(cityCode: String, districtSpinner: Spinner) {
+        val districtRef = database.child("hospitals").child(cityCode)
+
+        districtRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val districtMap = mutableMapOf<String, String>()
+                val districtNames = mutableListOf<String>()
+
+                for (child in snapshot.children) {
+                    val districtCode = child.key ?: continue
+                    districtMap[districtCode] = districtCode
+                    districtNames.add(districtCode)
+                }
+
+                val districtAdapter = ArrayAdapter(this@AddScheduleActivity, android.R.layout.simple_spinner_dropdown_item, districtNames)
+                districtSpinner.adapter = districtAdapter
+
+                districtSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        selectedDistrictCode = districtMap[districtNames[position]]
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
             }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    // ✅ 병원 검색 기능
+    private fun searchHospitals(query: String, citySpinner: Spinner, districtSpinner: Spinner, dialog: AlertDialog) {
+        val hospitalRef = database.child("hospitals").child(selectedCityCode!!).child(selectedDistrictCode!!)
+        val hospitalList = mutableListOf<String>()
+        val hospitalMap = mutableMapOf<String, String>()
+
+        hospitalRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (child in snapshot.children) {
+                    val hospitalName = child.child("name").getValue(String::class.java)
+                    val hospitalAddress = child.child("address").getValue(String::class.java)
+
+                    if (!hospitalName.isNullOrEmpty() && hospitalName.contains(query, ignoreCase = true)) {
+                        hospitalList.add(hospitalName)
+                        hospitalMap[hospitalName] = hospitalAddress ?: "주소 없음"
+                    }
+                }
+
+                if (hospitalList.isNotEmpty()) {
+                    showHospitalSelectionDialog(hospitalList, hospitalMap, dialog)
+                } else {
+                    Toast.makeText(this@AddScheduleActivity, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    // ✅ 병원 선택 다이얼로그
+    private fun showHospitalSelectionDialog(hospitalList: List<String>, hospitalMap: Map<String, String>, parentDialog: AlertDialog) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("병원 선택")
+
+        val hospitalArray = hospitalList.toTypedArray()
+        builder.setItems(hospitalArray) { _, which ->
+            selectedHospital = hospitalArray[which]
+            binding.etSearch.setText(selectedHospital)
+            binding.tvEditedSchedule.text = "선택된 병원: $selectedHospital\n주소: ${hospitalMap[selectedHospital]}"
+            parentDialog.dismiss() // 부모 팝업 닫기
+        }
+
+        builder.setNegativeButton("취소", null)
+        builder.show()
     }
 }
