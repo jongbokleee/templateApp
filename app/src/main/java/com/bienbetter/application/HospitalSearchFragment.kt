@@ -57,24 +57,30 @@ class HospitalSearchFragment : Fragment() {
 
     private fun fetchHospitalsFromFirebase(searchText: String, isSearchByName: Boolean = true) {
         hospitalList.clear()
+        var loadedCount = 0
+        val maxResults = 20
 
         database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                for (citySnapshot in snapshot.children) {
+                outer@ for (citySnapshot in snapshot.children) {
                     for (districtSnapshot in citySnapshot.children) {
                         for (hospitalSnapshot in districtSnapshot.children) {
                             val name = hospitalSnapshot.child("name").getValue(String::class.java) ?: continue
                             val address = hospitalSnapshot.child("address").getValue(String::class.java) ?: ""
                             val phone = hospitalSnapshot.child("phone").getValue(String::class.java) ?: ""
 
-                            val isMatch = if (isSearchByName) {
+                            val isMatch = if (searchText.isEmpty()) {
+                                true
+                            } else if (isSearchByName) {
                                 name.contains(searchText, ignoreCase = true)
                             } else {
                                 address.contains(searchText, ignoreCase = true)
                             }
 
-                            if (searchText.isEmpty() || isMatch) {
+                            if (isMatch) {
                                 hospitalList.add(Hospital(name, address, phone))
+                                loadedCount++
+                                if (searchText.isEmpty() && loadedCount >= maxResults) break@outer
                             }
                         }
                     }
