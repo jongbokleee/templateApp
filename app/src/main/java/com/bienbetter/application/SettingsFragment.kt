@@ -27,11 +27,30 @@ class SettingsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // 로그인 상태 다시 확인
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            binding.btnDeleteAccount.visibility = View.VISIBLE
+        } else {
+            binding.btnDeleteAccount.visibility = View.GONE
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Firebase 인증 객체 초기화
         firebaseAuth = FirebaseAuth.getInstance()
+
+        // 🔹 로그인 상태 확인하여 계정 탈퇴 버튼 보이기/숨기기
+        if (firebaseAuth.currentUser != null) {
+            binding.btnDeleteAccount.visibility = View.VISIBLE
+        } else {
+            binding.btnDeleteAccount.visibility = View.GONE
+        }
 
         // 푸시 알림 설정 스위치 변경 리스너
         binding.switchPushNotifications.setOnCheckedChangeListener { _, isChecked ->
