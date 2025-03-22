@@ -350,20 +350,20 @@ class AddScheduleActivity : AppCompatActivity() {
             Pair("41", "830") to "양평군",
 
             // ✅ 충청북도 (43)
-            Pair("43", "110") to "청주시 상당구",
-            Pair("43", "111") to "청주시 서원구",
-            Pair("43", "112") to "청주시 흥덕구",
-            Pair("43", "113") to "청주시 청원구",
+            Pair("43", "111") to "청주시 상당구",
+            Pair("43", "112") to "청주시 서원구",
+            Pair("43", "113") to "청주시 흥덕구",
+            Pair("43", "114") to "청주시 청원구",
             Pair("43", "130") to "충주시",
             Pair("43", "150") to "제천시",
             Pair("43", "720") to "보은군",
             Pair("43", "730") to "옥천군",
             Pair("43", "740") to "영동군",
+            Pair("43", "745") to "증평군",
             Pair("43", "750") to "진천군",
             Pair("43", "760") to "괴산군",
             Pair("43", "770") to "음성군",
-            Pair("43", "800") to "단양군",
-            Pair("43", "810") to "증평군"
+            Pair("43", "800") to "단양군"
 
             )
         return districtCodeMap[Pair(cityCode, districtCode)] ?: districtCode
