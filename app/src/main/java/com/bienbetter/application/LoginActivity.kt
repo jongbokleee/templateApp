@@ -53,6 +53,11 @@ class LoginActivity : AppCompatActivity() {
         binding.btnJoin.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
+
+        binding.backButton.setOnClickListener {
+            finish()  // 현재 액티비티 종료
+        }
+
     }
 
     // ✅ 4. 이메일 로그인 기능 추가

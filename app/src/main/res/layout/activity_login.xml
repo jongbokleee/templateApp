@@ -125,4 +125,16 @@
         android:padding="8dp"
         android:layout_gravity="center_horizontal"/>
 
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="홈으로 이동"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#000000"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        />
+
 </LinearLayout>
