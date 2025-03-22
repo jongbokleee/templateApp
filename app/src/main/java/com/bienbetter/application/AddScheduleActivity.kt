@@ -34,6 +34,10 @@ class AddScheduleActivity : AppCompatActivity() {
             showSearchPopup()
         }
 
+        binding.backButton.setOnClickListener {
+            finish()  // 현재 액티비티 종료
+        }
+
         binding.btnAddSchedule.setOnClickListener {
             val uid = auth.currentUser?.uid
             if (uid != null && selectedDate != null && selectedHospital != null) {
