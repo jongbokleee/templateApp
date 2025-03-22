@@ -55,31 +55,46 @@ class HistoryFragment : Fragment() {
 
     // 📌 기록 데이터 로드 (Firebase에서 데이터 가져오기)
     private fun loadHistoryData() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (userId == null) {
+            // 비회원인 경우 처리
+            filteredList.clear()
+            historyAdapter.notifyDataSetChanged()
+
+            binding.recyclerViewHistory.visibility = View.GONE
+            binding.tvNoHistory.visibility = View.VISIBLE
+            return
+        }
+
         val database = FirebaseDatabase.getInstance().reference.child("schedules").child(userId)
 
         database.get().addOnSuccessListener { snapshot ->
-            if (snapshot.exists()) {
-                historyList.clear() // ✅ 기존 데이터 초기화 (중복 방지)
+            historyList.clear()
+            filteredList.clear()
 
+            if (snapshot.exists()) {
                 for (child in snapshot.children) {
                     val hospital = child.child("hospital").value as? String ?: "병원 정보 없음"
                     val date = child.child("date").value as? String ?: "날짜 정보 없음"
-
                     val historyText = "$date - $hospital"
-                    if (!historyList.contains(HistoryItem(historyText))) { // ✅ 중복 데이터 방지
+                    if (!historyList.contains(HistoryItem(historyText))) {
                         historyList.add(HistoryItem(historyText))
                     }
                 }
 
-                // ✅ 최신 날짜가 먼저 나오도록 정렬 (내림차순)
                 historyList.sortByDescending { parseDate(it.text) }
 
-                // ✅ 초기에는 전체 데이터 표시
-                filteredList.clear()
                 filteredList.addAll(historyList)
-                historyAdapter.notifyDataSetChanged()
+                binding.recyclerViewHistory.visibility = View.VISIBLE
+                binding.tvNoHistory.visibility = View.GONE
+            } else {
+                // 기록이 아예 없는 경우
+                binding.recyclerViewHistory.visibility = View.GONE
+                binding.tvNoHistory.visibility = View.VISIBLE
             }
+
+            historyAdapter.notifyDataSetChanged()
         }.addOnFailureListener {
             Toast.makeText(requireContext(), "기록을 불러오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
         }
@@ -99,7 +114,11 @@ class HistoryFragment : Fragment() {
 
         // ✅ 검색 결과가 없으면 "검색 결과 없음" 메시지 표시
         if (filteredList.isEmpty()) {
-            Toast.makeText(requireContext(), "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show()
+            binding.tvNoHistory.visibility = View.VISIBLE
+            binding.recyclerViewHistory.visibility = View.GONE
+        } else {
+            binding.tvNoHistory.visibility = View.GONE
+            binding.recyclerViewHistory.visibility = View.VISIBLE
         }
 
         historyAdapter.notifyDataSetChanged() // ✅ RecyclerView 갱신
