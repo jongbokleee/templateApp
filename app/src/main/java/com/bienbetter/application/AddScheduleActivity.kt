@@ -33,6 +33,28 @@ class AddScheduleActivity : AppCompatActivity() {
         binding.btnSearch.setOnClickListener {
             showSearchPopup()
         }
+
+        binding.btnAddSchedule.setOnClickListener {
+            val uid = auth.currentUser?.uid
+            if (uid != null && selectedDate != null && selectedHospital != null) {
+                val schedule = mapOf(
+                    "date" to selectedDate,
+                    "hospital" to selectedHospital,
+                    "uid" to uid,
+                    "userId" to uid
+                )
+                database.child("schedules").child(uid).push().setValue(schedule)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "일정이 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                        finish() // 저장 후 홈으로 이동하려면
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(this, "날짜와 병원을 모두 선택하세요.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     // ✅ 캘린더 선택 기능 추가
@@ -200,7 +222,7 @@ class AddScheduleActivity : AppCompatActivity() {
         builder.setItems(hospitalArray) { _, which ->
             selectedHospital = hospitalArray[which]
             binding.etSearch.setText(selectedHospital)
-            binding.tvEditedSchedule.text = "선택된 병원: $selectedHospital\n주소: ${hospitalMap[selectedHospital]}"
+            binding.tvEditedSchedule.text = "선택된 병원: $selectedHospital"
             parentDialog.dismiss() // 부모 팝업 닫기
         }
 
