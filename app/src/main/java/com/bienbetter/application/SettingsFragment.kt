@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import com.bienbetter.application.databinding.FragmentSettingsBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 
 class SettingsFragment : Fragment() {
@@ -75,7 +77,8 @@ class SettingsFragment : Fragment() {
                         .addOnCompleteListener { userTask ->
                             if (userTask.isSuccessful) {
                                 // ✅ 3. 계정 삭제
-                                reauthenticateAndDeleteUser(user)
+                                deleteUserAccount(user)
+//                                reauthenticateAndDeleteUser(user)
                             } else {
                                 Toast.makeText(requireContext(), "사용자 데이터 삭제 실패", Toast.LENGTH_SHORT).show()
                             }
@@ -86,24 +89,24 @@ class SettingsFragment : Fragment() {
             }
     }
 
-    // ✅ Google 계정 재인증 후 Firebase 계정 삭제
-    private fun reauthenticateAndDeleteUser(user: FirebaseUser) {
-        val googleAccount = GoogleSignIn.getLastSignedInAccount(requireContext())
-
-        if (googleAccount != null) {
-            val credential = GoogleAuthProvider.getCredential(googleAccount.idToken, null)
-
-            user.reauthenticate(credential).addOnCompleteListener { reauthTask ->
-                if (reauthTask.isSuccessful) {
-                    deleteUserAccount(user) // ✅ 인증 성공 시 계정 삭제
-                } else {
-                    Toast.makeText(requireContext(), "Google 로그인 재인증 실패", Toast.LENGTH_SHORT).show()
-                }
-            }
-        } else {
-            Toast.makeText(requireContext(), "Google 계정 정보를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
-        }
-    }
+//    // ✅ Google 계정 재인증 후 Firebase 계정 삭제
+//    private fun reauthenticateAndDeleteUser(user: FirebaseUser) {
+//        val googleAccount = GoogleSignIn.getLastSignedInAccount(requireContext())
+//
+//        if (googleAccount != null) {
+//            val credential = GoogleAuthProvider.getCredential(googleAccount.idToken, null)
+//
+//            user.reauthenticate(credential).addOnCompleteListener { reauthTask ->
+//                if (reauthTask.isSuccessful) {
+//                    deleteUserAccount(user) // ✅ 인증 성공 시 계정 삭제
+//                } else {
+//                    Toast.makeText(requireContext(), "Google 로그인 재인증 실패", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        } else {
+//            Toast.makeText(requireContext(), "Google 계정 정보를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
     // 🔹 **Firebase 계정 삭제**
     private fun deleteUserAccount(user: FirebaseUser) {
@@ -122,11 +125,13 @@ class SettingsFragment : Fragment() {
         firebaseAuth.signOut() // ✅ Firebase 로그아웃
 
         // ✅ Google 계정 로그아웃
-        GoogleSignIn.getClient(requireContext(), GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+//        GoogleSignIn.getClient(requireContext(), GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
 
-        // ✅ `MainActivity`에서 `HomeFragment`를 첫 화면으로 설정
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        val intent = Intent(requireContext(), MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("navigateTo", "home")
+        }
         startActivity(intent)
     }
 }

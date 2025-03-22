@@ -30,13 +30,17 @@ class MainActivity : AppCompatActivity() {
 
         val navigateTo = intent.getStringExtra("navigateTo")
 
-        if (navigateTo == "HospitalSearchFragment") {
-            switchFragment(hospitalFragment)
-        }
-
-        if (navigateTo == "HomeFragment") {
-            switchFragment(homeFragment)
-            binding.bottomNavigation.selectedItemId = R.id.nav_home
+        when (navigateTo) {
+            "HospitalSearchFragment" -> switchFragment(hospitalFragment)
+            "HomeFragment" -> {
+                switchFragment(homeFragment)
+                binding.bottomNavigation.selectedItemId = R.id.nav_home
+            }
+            "SettingsFragment" -> switchFragment(settingsFragment)
+            else -> { // 🔹 기본값: 홈 화면
+                switchFragment(homeFragment)
+                binding.bottomNavigation.selectedItemId = R.id.nav_home
+            }
         }
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
