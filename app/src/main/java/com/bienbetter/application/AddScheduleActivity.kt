@@ -218,6 +218,7 @@ class AddScheduleActivity : AppCompatActivity() {
     }
 
     // ✅ 병원 선택 다이얼로그
+// ✅ 병원 선택 다이얼로그
     private fun showHospitalSelectionDialog(hospitalList: List<String>, hospitalMap: Map<String, String>, parentDialog: AlertDialog) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("병원 선택")
@@ -226,7 +227,20 @@ class AddScheduleActivity : AppCompatActivity() {
         builder.setItems(hospitalArray) { _, which ->
             selectedHospital = hospitalArray[which]
             binding.etSearch.setText(selectedHospital)
-            binding.tvEditedSchedule.text = "선택된 병원: $selectedHospital"
+
+            // ✅ 병원명 표시 포맷팅
+            val displayName = selectedHospital?.let {
+                if (it.length > 14) {
+                    val prefix = it.take(6)
+                    val suffix = it.takeLast(6)
+                    "$prefix...$suffix"
+                } else {
+                    it
+                }
+            } ?: ""
+
+            binding.tvEditedSchedule.text = "선택 병원: $displayName"
+
             parentDialog.dismiss() // 부모 팝업 닫기
         }
 

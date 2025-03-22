@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FFFFFF"
-    android:padding="0dp">
+    android:background="#FFFFFF">
 
+    <!-- 상단 타이틀 -->
     <TextView
         android:id="@+id/titleText"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="건강검진 일정관리"
         android:textSize="20sp"
@@ -17,105 +17,121 @@
         android:textColor="@android:color/white"
         android:gravity="center"
         android:background="#1976D2"
-        android:padding="12dp"/>
+        android:padding="12dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 병원 알아보기 -->
     <TextView
         android:id="@+id/tvFindHospital"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="🏥 건강검진 병원 알아보기"
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:paddingTop="16dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingTop="25dp"
-        />
+        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/homeBtnFindHospital"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="병원 찾기 화면으로 이동"
-        android:gravity="start"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
+        android:gravity="start"
         android:background="@drawable/rounded_button"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:elevation="4dp"
-        android:padding="12dp"/>
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvFindHospital"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
-    <!-- 다가오는 건강검진 일정에 관한 데이터 파이어베이스에서 조회해서 추가-->
+    <!-- 다가오는 일정 -->
     <TextView
         android:id="@+id/tvUpcomingCheckup"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="📅 다가오는 건강검진 일정"
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
+        android:paddingTop="24dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingTop="25dp"
-        />
+        app:layout_constraintTop_toBottomOf="@id/homeBtnFindHospital"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/tvScheduleLimitNotice"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
         android:text="※ 최근 3개의 건강검진 일정만 표시됩니다."
         android:textSize="12sp"
         android:textColor="@android:color/darker_gray"
-        android:paddingTop="8dp"
-        android:paddingEnd="8dp"
-        android:visibility="gone"/>  <!-- 기본적으로 숨김 -->
+        android:paddingTop="4dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvUpcomingCheckup"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tvNoSchedules"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="추가된 건강검진 일정이 없습니다"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
-        android:padding="16dp"/>
-    <!-- RecyclerView -->
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvScheduleLimitNotice"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 일정 리스트 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewSchedules"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="6"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvNoSchedules"
+        app:layout_constraintBottom_toTopOf="@id/homeBtnAddSchedule"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ✅ 하단 버튼들을 LinearLayout으로 묶어 고정 -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- 하단 버튼들 -->
+    <Button
+        android:id="@+id/homeBtnAddSchedule"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:orientation="vertical"
-        android:paddingTop="0dp"
-        android:paddingEnd="8dp">
+        android:text="검진 일정 추가하기"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#90CAF9"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@id/btnLogout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <Button
-            android:id="@+id/homeBtnAddSchedule"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="검진 일정 추가하기"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#90CAF9"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:id="@+id/btnLogout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="로그아웃"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#1976D2"
-           />
-    </LinearLayout>
-</LinearLayout>
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="로그아웃"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1976D2"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -37,20 +37,17 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ✅ Firebase 초기화
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference.child("schedules")
 
-        // ✅ 로그인 상태 확인 후 UI 업데이트
-        updateUI(auth.currentUser != null)
-
-        // ✅ RecyclerView 설정
         setupRecyclerView()
 
-        // ✅ Firebase에서 일정 데이터 불러오기
-        loadSchedulesFromFirebase()
+        binding.homeBtnFindHospital.setOnClickListener {
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            intent.putExtra("navigateTo", "HospitalSearchFragment")
+            startActivity(intent)
+        }
 
-        // ✅ 로그인 여부 확인 후 검진 일정 추가
         binding.homeBtnAddSchedule.setOnClickListener {
             if (auth.currentUser != null) {
                 startActivity(Intent(requireContext(), AddScheduleActivity::class.java))
@@ -59,17 +56,12 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // ✅ "건강검진 받을 병원 알아보기" 버튼 클릭 시 병원 검색 화면으로 이동
-        binding.homeBtnFindHospital.setOnClickListener {
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            intent.putExtra("navigateTo", "HospitalSearchFragment")
-            startActivity(intent)
-        }
-
-        // ✅ 로그아웃 버튼 클릭 시 로그아웃 처리
         binding.btnLogout.setOnClickListener {
             logout()
         }
+
+        updateUI(auth.currentUser != null)
+        loadSchedulesFromFirebase()
     }
 
     override fun onResume() {
@@ -132,6 +124,7 @@ class HomeFragment : Fragment() {
     private fun updateUI(isLoggedIn: Boolean) {
         binding.btnLogout.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
         binding.tvScheduleLimitNotice.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
+        binding.homeBtnAddSchedule.visibility = View.VISIBLE
     }
 
     // ✅ 로그아웃 처리

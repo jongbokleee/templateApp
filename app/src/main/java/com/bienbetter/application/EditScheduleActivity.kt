@@ -72,7 +72,8 @@ class EditScheduleActivity : AppCompatActivity() {
     private fun updateSelectedScheduleText() {
         val hospital = selectedHospital ?: "병원 미선택"
         val date = selectedDate ?: "날짜 미선택"
-        binding.tvEditedSchedule.text = "$hospital | $date"
+        val displayHospital = if (hospital.length > 14) "${hospital.take(6)}...${hospital.takeLast(6)}" else hospital
+        binding.tvEditedSchedule.text = "$displayHospital | $date"
     }
 
     private fun showSearchPopup() {
