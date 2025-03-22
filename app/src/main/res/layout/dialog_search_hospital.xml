@@ -3,13 +3,28 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="#FFFFFF"
     android:padding="16dp">
+
+    <!-- 다이얼로그 제목 -->
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="검진 받을 병원 검색"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#1976D2"
+        android:padding="12dp" />
 
     <!-- 시도 선택 -->
     <Spinner
         android:id="@+id/spinnerCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:background="@android:drawable/edit_text"
         android:padding="8dp"/>
 
     <!-- 시군구 선택 -->
@@ -17,7 +32,9 @@
         android:id="@+id/spinnerDistrict"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="#000000"
         android:padding="8dp"
+        android:background="@android:drawable/edit_text"
         android:layout_marginTop="8dp"/>
 
     <!-- 병원 검색 입력 -->
@@ -38,5 +55,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="🔍 검색"
+        android:background="#1976D2"
         android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btnCloseDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="닫기"
+        android:layout_marginTop="8dp"
+        android:background="#DDDDDD"
+        android:textColor="#000000" />
 </LinearLayout>
