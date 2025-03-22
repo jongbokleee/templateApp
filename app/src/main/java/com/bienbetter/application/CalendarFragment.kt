@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bienbetter.application.databinding.FragmentCalendarBinding
@@ -22,9 +23,9 @@ class CalendarFragment : Fragment() {
     private lateinit var binding: FragmentCalendarBinding
     private lateinit var database: DatabaseReference
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
-    private val scheduleMap = mutableMapOf<String, String>() // 🔹 날짜별 일정 저장
-    private val scheduleDates = mutableListOf<CalendarDay>() // 🔹 캘린더에서 표시할 날짜 저장
-    private var selectedDate: String? = null // 🔹 HomeFragment에서 넘어온 날짜 저장
+    private val scheduleMap = mutableMapOf<String, MutableList<Triple<String, String, String>>>() // date -> List<Triple<hospital, date, key>>
+    private val scheduleDates = mutableListOf<CalendarDay>()
+    private var selectedDate: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,43 +45,13 @@ class CalendarFragment : Fragment() {
 
         // ✅ HomeFragment에서 선택한 날짜를 받아 저장
         selectedDate = arguments?.getString("selected_date")
-
-        // ✅ "수정하기" 버튼 클릭 시 EditScheduleActivity로 이동
-        binding.btnEditSchedule.setOnClickListener {
-            val selectedDateStr = binding.tvSelectedSchedule.text.toString().split("|")[1].trim() // 날짜 추출
-            val selectedHospital = binding.tvSelectedSchedule.text.toString().split("|")[0].trim() // 병원 추출
-
-            // 🔹 Firebase에서 해당 일정의 키 가져오기
-            val userId = auth.currentUser?.uid ?: return@setOnClickListener
-            database.child(userId).orderByChild("date").equalTo(selectedDateStr)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (child in snapshot.children) {
-                            val scheduleKey = child.key // 🔹 Firebase의 해당 일정 키 가져오기
-
-                            val intent = Intent(requireContext(), EditScheduleActivity::class.java).apply {
-                                putExtra("selected_date", selectedDateStr)
-                                putExtra("selected_hospital", selectedHospital)
-                                putExtra("schedule_key", scheduleKey)
-                            }
-                            startActivity(intent)
-                            break // 한 개만 수정하면 되므로 루프 종료
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(requireContext(), "일정 정보를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                })
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        loadSchedulesFromFirebase() // ✅ 캘린더 화면으로 돌아올 때 데이터를 새로 불러오기
+        loadSchedulesFromFirebase()
     }
 
-    // ✅ 캘린더 설정 (월 제목 및 요일 표시)
     private fun setupCalendarView() {
         binding.calendarView.state().edit()
             .setCalendarDisplayMode(CalendarMode.MONTHS)
@@ -90,7 +61,7 @@ class CalendarFragment : Fragment() {
         // ✅ 상단 타이틀 (YYYY년 MM월)
         binding.calendarView.setTitleFormatter { day ->
             val calendar = Calendar.getInstance()
-            calendar.set(day.year, day.month - 1, 1) // 📌 `-1`로 보정 필요
+            calendar.set(day.year, day.month - 1, 1)
             SimpleDateFormat("yyyy년 MM월", Locale.getDefault()).format(calendar.time)
         }
 
@@ -110,17 +81,39 @@ class CalendarFragment : Fragment() {
 
         // ✅ 날짜 선택 시 일정 표시
         binding.calendarView.setOnDateChangedListener { _, date, _ ->
-            val selectedDateStr = formatDate("${date.year}-${date.month}-${date.day}") // month에 +1 하면 안 됨
-            val scheduleText = scheduleMap[selectedDateStr] ?: "선택된 일정이 없습니다."
+            val selectedDateStr = formatDate("${date.year}-${date.month}-${date.day}")
+            displaySchedulesForDate(selectedDateStr)
+        }
+    }
 
-            binding.tvSelectedSchedule.text = scheduleText
+    private fun displaySchedulesForDate(dateStr: String) {
+        binding.scheduleListContainer.removeAllViews()
+        val schedules = scheduleMap[dateStr]
 
-            // ✅ 선택된 날짜에 일정이 있는 경우 버튼 보이기, 없으면 숨기기
-            if (scheduleMap.containsKey(selectedDateStr)) {
-                binding.btnEditSchedule.visibility = View.VISIBLE
-            } else {
-                binding.btnEditSchedule.visibility = View.GONE
+        if (schedules.isNullOrEmpty()) {
+            val tv = TextView(requireContext()).apply {
+                text = "선택된 일정이 없습니다."
+                setPadding(16, 16, 16, 16)
             }
+            binding.scheduleListContainer.addView(tv)
+            return
+        }
+
+        for ((hospital, date, key) in schedules) {
+            val itemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_schedule_editable, null)
+            val tvHospital = itemView.findViewById<TextView>(R.id.tvHospital)
+            val btnEdit = itemView.findViewById<TextView>(R.id.btnEdit)
+
+            tvHospital.text = "$hospital | $date"
+            btnEdit.setOnClickListener {
+                val intent = Intent(requireContext(), EditScheduleActivity::class.java).apply {
+                    putExtra("selected_date", date)
+                    putExtra("selected_hospital", hospital)
+                    putExtra("schedule_key", key)
+                }
+                startActivity(intent)
+            }
+            binding.scheduleListContainer.addView(itemView)
         }
     }
 
@@ -133,26 +126,27 @@ class CalendarFragment : Fragment() {
                 scheduleDates.clear()
 
                 for (child in snapshot.children) {
-                    val hospital = child.child("hospital").getValue(String::class.java) ?: "알 수 없음"
-                    val date = child.child("date").getValue(String::class.java) ?: "날짜 없음"
-                    val formattedDate = formatDate(date) // 🔹 날짜 형식 변환
-                    scheduleMap[formattedDate] = "$hospital | $date"
+                    val key = child.key ?: continue
+                    val hospital = child.child("hospital").getValue(String::class.java) ?: continue
+                    val date = child.child("date").getValue(String::class.java) ?: continue
+                    val formattedDate = formatDate(date)
 
-                    parseDateToCalendarDay(formattedDate)?.let {
-                        scheduleDates.add(it)
-                    }
+                    val list = scheduleMap.getOrPut(formattedDate) { mutableListOf() }
+                    list.add(Triple(hospital, formattedDate, key))
+
+                    parseDateToCalendarDay(formattedDate)?.let { scheduleDates.add(it) }
                 }
 
-                // ✅ 일정이 있는 날짜에 원(DotSpan) 추가
+                binding.calendarView.removeDecorators()
                 binding.calendarView.addDecorator(EventDecorator(Color.RED, scheduleDates))
 
                 // ✅ HomeFragment에서 넘어온 날짜를 캘린더에 반영 (Firebase 데이터 로딩 후)
                 selectedDate?.let { date ->
-                    val parsedDate = parseDateToCalendarDay(date)
-                    parsedDate?.let {
+                    val parsed = parseDateToCalendarDay(date)
+                    parsed?.let {
                         binding.calendarView.setDateSelected(it, true)
                         binding.calendarView.currentDate = it
-                        binding.tvSelectedSchedule.text = scheduleMap[date] ?: "선택된 일정이 없습니다."
+                        displaySchedulesForDate(date)
                     }
                 }
             }
@@ -166,8 +160,8 @@ class CalendarFragment : Fragment() {
     // 🔹 날짜 형식을 통일하는 함수
     private fun formatDate(date: String): String {
         return try {
-            val inputFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault()) // 예: 2025-3-13
-            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) // 예: 2025-03-13
+            val inputFormat = SimpleDateFormat("yyyy-M-d", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val parsedDate = inputFormat.parse(date) ?: return date
             outputFormat.format(parsedDate)
         } catch (e: Exception) {
@@ -183,9 +177,9 @@ class CalendarFragment : Fragment() {
             val calendar = Calendar.getInstance()
             date?.let {
                 calendar.time = it
-                return CalendarDay.from(
+                CalendarDay.from(
                     calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH)+1, // +1 제거하면 안 됨 ✅
+                    calendar.get(Calendar.MONTH) + 1,
                     calendar.get(Calendar.DAY_OF_MONTH)
                 )
             }
