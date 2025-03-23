@@ -101,36 +101,13 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun showTermsDialog() {
-        val termsText = getString(R.string.terms_of_service_text)
-
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("서비스 이용약관")
-            .setMessage(termsText)
-            .setPositiveButton("닫기", null)
-            .create()
-
-        dialog.show()
-
-        // 스크롤 가능하게 처리
-        dialog.findViewById<android.widget.TextView>(android.R.id.message)?.movementMethod =
-            android.text.method.ScrollingMovementMethod()
+        val intent = Intent(this, TermsOfServiceActivity::class.java)
+        startActivity(intent)
     }
 
     private fun showPrivacyPolicyDialog() {
-        val privacyText = getString(R.string.privacy_policy_text)
-
-        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("개인정보처리방침")
-            .setMessage(privacyText)
-            .setPositiveButton("닫기", null)
-            .create()
-
-        dialog.show()
-
-        // 메시지 스크롤 가능하게 설정
-        dialog.findViewById<android.widget.TextView>(android.R.id.message)?.apply {
-            movementMethod = android.text.method.ScrollingMovementMethod()
-        }
+        val intent = Intent(this, PrivacyPolicyActivity::class.java)
+        startActivity(intent)
     }
 
     // ✅ 이메일 중복 확인 (Authentication + Database)
