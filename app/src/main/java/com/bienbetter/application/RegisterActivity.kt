@@ -172,8 +172,6 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.etEmail.error = if (!emailValid && email.isNotEmpty()) "이메일 형식이 올바르지 않습니다" else null
         binding.etRegisterPassword.error = if (!passwordValid && password.isNotEmpty()) "영문, 숫자, 특수문자 포함 8자 이상" else null
-
-        binding.btnRegister.isEnabled = emailValid && passwordValid && isEmailChecked
     }
 
     private fun isEmailValid(email: String): Boolean {

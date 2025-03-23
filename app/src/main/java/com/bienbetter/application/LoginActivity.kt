@@ -3,59 +3,94 @@ package com.bienbetter.application
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bienbetter.application.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
-    private val database = FirebaseDatabase.getInstance().reference // ✅ Firebase Database 초기화
+    private val database = FirebaseDatabase.getInstance().reference
 
     companion object {
-        private const val RC_SIGN_IN = 9001 // 구글 로그인 요청 코드
+        private const val RC_SIGN_IN = 9001
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // ✅ ViewBinding 초기화
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ✅ FirebaseAuth 초기화
         auth = FirebaseAuth.getInstance()
 
-        // ✅ 1. Google 로그인 버튼
-        binding.btnGoogleSignIn.setOnClickListener {
-            signInWithGoogle()
-        }
+        // Google 로그인
+        binding.btnGoogleSignIn.setOnClickListener { signInWithGoogle() }
 
-        // ✅ 2. 일반 로그인 버튼 추가
+        // 일반 로그인
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
             loginWithEmail(email, password)
         }
 
-        // ✅ 3. 회원가입 버튼 (RegisterActivity로 이동)
+        // 비밀번호 찾기
+        binding.tvFindPassword.setOnClickListener {
+            val email = binding.etEmail.text.toString().trim()
+
+            if (email.isEmpty()) {
+                Toast.makeText(this, "비밀번호 재설정을 위해 이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "올바른 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val usersRef = FirebaseDatabase.getInstance().reference.child("users")
+            usersRef.orderByChild("email").equalTo(email)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(this@LoginActivity, "비밀번호 재설정 이메일이 전송되었습니다.", Toast.LENGTH_LONG).show()
+                                    } else {
+                                        Toast.makeText(this@LoginActivity, "이메일 전송 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        } else {
+                            Toast.makeText(this@LoginActivity, "등록되지 않은 이메일입니다.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@LoginActivity, "데이터베이스 오류: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+        }
+
+        // 회원가입 이동
         binding.btnJoin.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         binding.backButton.setOnClickListener {
-            finish()  // 현재 액티비티 종료
+            finish()
         }
-
     }
 
-    // ✅ 4. 이메일 로그인 기능 추가
     private fun loginWithEmail(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "이메일과 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show()
@@ -66,8 +101,8 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    if (user != null) {
-                        fetchAndSaveFcmToken(user.uid) // ✅ 로그인 후 FCM 토큰 저장
+                    user?.let {
+                        fetchAndSaveFcmToken(it.uid)
                         moveToAddScheduleActivity()
                     }
                 } else {
@@ -76,20 +111,17 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // ✅ 2 구글 로그인 요청
     private fun signInWithGoogle() {
         val googleSignInClient = GoogleSignIn.getClient(
             this, GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // 🔹 Firebase Console에서 생성한 웹 클라이언트 ID 필요
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build()
         )
 
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
     }
 
-    // ✅ 3 구글 로그인 결과 처리
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -105,23 +137,19 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ 4 Firebase 인증 처리
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    if (user != null) {
-                        saveUserToDatabase(user) // ✅ 사용자 정보를 Realtime Database에 저장
-                    }
+                    user?.let { saveUserToDatabase(it) }
                 } else {
                     Toast.makeText(this, "Firebase 인증 실패", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    // ✅ 5 Firebase Database에 사용자 정보 저장 + FCM 토큰 저장
     private fun saveUserToDatabase(user: FirebaseUser) {
         val userData = mapOf(
             "uid" to user.uid,
@@ -132,36 +160,30 @@ class LoginActivity : AppCompatActivity() {
         database.child("users").child(user.uid).setValue(userData)
             .addOnSuccessListener {
                 Log.d("LoginActivity", "사용자 정보 저장 완료")
-
-                // 🔹 로그인 후 FCM 토큰 저장
                 fetchAndSaveFcmToken(user.uid)
-
-                moveToAddScheduleActivity() // ✅ DB 저장 후 이동
+                moveToAddScheduleActivity()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "데이터 저장 실패", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // ✅ 🔹 로그인 후 FCM 토큰을 가져와 저장하는 함수 추가
     private fun fetchAndSaveFcmToken(userId: String) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
+            if (task.isSuccessful) {
+                task.result?.let { token ->
+                    database.child("users").child(userId).child("fcmToken").setValue(token)
+                        .addOnSuccessListener { Log.d("LoginActivity", "FCM 토큰 저장 완료") }
+                        .addOnFailureListener { Log.e("LoginActivity", "FCM 토큰 저장 실패", it) }
+                }
+            } else {
                 Log.w("LoginActivity", "FCM 토큰 가져오기 실패", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = task.result
-            if (token != null) {
-                database.child("users").child(userId).child("fcmToken").setValue(token)
-                    .addOnSuccessListener { Log.d("LoginActivity", "FCM 토큰 저장 완료") }
-                    .addOnFailureListener { Log.e("LoginActivity", "FCM 토큰 저장 실패", it) }
             }
         }
     }
 
-    // ✅ 일정 추가 화면으로 이동
     private fun moveToAddScheduleActivity() {
         startActivity(Intent(this, AddScheduleActivity::class.java))
-        finish() // 🔹 로그인 화면 종료
+        finish()
     }
 }

@@ -74,6 +74,19 @@
         android:background="@android:drawable/edit_text"
         android:layout_marginTop="8dp" />
 
+    <!-- 비밀번호 재설정 링크 -->
+    <TextView
+        android:id="@+id/tvFindPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="비밀번호를 잊으셨나요?"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="14sp"
+        android:gravity="end"/>
+
     <!-- 일반 로그인 버튼 -->
     <Button
         android:id="@+id/btnLogin"
