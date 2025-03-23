@@ -130,12 +130,20 @@ class HomeFragment : Fragment() {
     // ✅ 로그아웃 처리
     private fun logout() {
         auth.signOut()
-        GoogleSignIn.getClient(requireContext(), GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .signOut()
-            .addOnCompleteListener {
-                updateUI(false)
-                requireActivity().recreate()
-                Toast.makeText(requireContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show()
-            }
+
+        // ✅ 홈 탭으로 강제 이동하며 MainActivity 새로 시작
+        val intent = Intent(requireContext(), MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("navigateTo", "HomeFragment")
+        }
+        startActivity(intent)
+        // 구글 로그인 현재 안 사용하므로 주석
+//        GoogleSignIn.getClient(requireContext(), GoogleSignInOptions.DEFAULT_SIGN_IN)
+//            .signOut()
+//            .addOnCompleteListener {
+//                updateUI(false)
+//                requireActivity().recreate()
+//                Toast.makeText(requireContext(), "로그아웃되었습니다.", Toast.LENGTH_SHORT).show()
+//            }
     }
 }
