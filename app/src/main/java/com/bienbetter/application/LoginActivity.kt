@@ -32,11 +32,6 @@ class LoginActivity : AppCompatActivity() {
         // ✅ FirebaseAuth 초기화
         auth = FirebaseAuth.getInstance()
 
-        // ✅ 로그인 상태 확인 → 이미 로그인된 경우 바로 이동
-        if (auth.currentUser != null) {
-            moveToAddScheduleActivity()
-        }
-
         // ✅ 1. Google 로그인 버튼
         binding.btnGoogleSignIn.setOnClickListener {
             signInWithGoogle()
