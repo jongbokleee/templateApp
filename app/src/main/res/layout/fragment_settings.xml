@@ -40,6 +40,20 @@
         android:trackTint="@color/black"
         />
 
+    <!-- 개인정보처리방침 보기 -->
+    <TextView
+        android:id="@+id/tvPrivacyPolicy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="개인정보처리방침 보기"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        />
+
+
     <!-- 계정 탈퇴 버튼 -->
     <Button
         android:id="@+id/btnDeleteAccount"

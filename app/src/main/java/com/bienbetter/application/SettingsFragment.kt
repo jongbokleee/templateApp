@@ -3,6 +3,7 @@ package com.bienbetter.application
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -58,10 +59,28 @@ class SettingsFragment : Fragment() {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
 
+        binding.tvPrivacyPolicy.setOnClickListener {
+            showPrivacyPolicyDialog()
+        }
+
         // 계정 탈퇴 버튼 클릭 시 경고 메시지 표시
         binding.btnDeleteAccount.setOnClickListener {
             showDeleteAccountDialog()
         }
+    }
+
+    private fun showPrivacyPolicyDialog() {
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_privacy_policy, null)
+
+        val tvPolicy = dialogView.findViewById<TextView>(R.id.tvPolicyContent)
+        tvPolicy.text = getString(R.string.privacy_policy_text)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("개인정보처리방침")
+            .setView(dialogView)
+            .setPositiveButton("닫기", null)
+            .show()
     }
 
     // 🔹 계정 탈퇴 확인 다이얼로그
