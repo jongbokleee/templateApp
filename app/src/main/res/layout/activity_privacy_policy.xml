@@ -1,0 +1,86 @@
+<!-- res/layout/activity_privacy_policy.xml -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="개인정보 처리방침"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="#1976D2"
+            android:gravity="center"
+            android:padding="12dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/title"
+            android:text="개인정보처리방침"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:padding="8dp" />
+
+        <!-- 목차 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/subTitle"
+            android:text="목차"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_blue_dark"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvGotoSection1"
+            android:text="제1조. 개인정보의 수집 항목 및 방법"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_blue_dark"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvGotoSection2"
+            android:text="제2조. 개인정보의 이용 목적"
+            android:textSize="16sp"
+            android:textColor="@android:color/holo_blue_dark"
+            android:padding="8dp" />
+
+        <!-- 실제 본문 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/section1"
+            android:text="제1조 (개인정보의 수집 항목 및 방법)\n여기에 해당 조항 내용을 입력하세요."
+            android:textSize="15sp"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="24dp"
+            android:padding="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/section2"
+            android:text="제2조 (개인정보의 이용 목적)\n여기에 해당 조항 내용을 입력하세요."
+            android:textSize="15sp"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="24dp"
+            android:padding="8dp" />
+    </LinearLayout>
+</ScrollView>

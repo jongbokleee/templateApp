@@ -59,28 +59,15 @@ class SettingsFragment : Fragment() {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
 
-        binding.tvPrivacyPolicy.setOnClickListener {
-            showPrivacyPolicyDialog()
+        binding.layoutPrivacyPolicy.setOnClickListener {
+            val intent = Intent(requireContext(), PrivacyPolicyActivity::class.java)
+            startActivity(intent)
         }
 
         // 계정 탈퇴 버튼 클릭 시 경고 메시지 표시
         binding.btnDeleteAccount.setOnClickListener {
             showDeleteAccountDialog()
         }
-    }
-
-    private fun showPrivacyPolicyDialog() {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_privacy_policy, null)
-
-        val tvPolicy = dialogView.findViewById<TextView>(R.id.tvPolicyContent)
-        tvPolicy.text = getString(R.string.privacy_policy_text)
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("개인정보처리방침")
-            .setView(dialogView)
-            .setPositiveButton("닫기", null)
-            .show()
     }
 
     // 🔹 계정 탈퇴 확인 다이얼로그

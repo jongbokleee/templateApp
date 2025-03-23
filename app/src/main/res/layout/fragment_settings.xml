@@ -20,38 +20,58 @@
         android:padding="12dp"/>
 
     <!-- 푸시 알림 설정 -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="푸시 알림 설정"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"
-        android:paddingStart="16dp"
-        />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
-    <Switch
-        android:id="@+id/switchPushNotifications"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:padding="16dp"
-        android:thumbTint="@color/light_gray"
-        android:trackTint="@color/black"
-        />
+        <TextView
+            android:id="@+id/tvPushNotificationLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="푸시 알림 설정"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
 
-    <!-- 개인정보처리방침 보기 -->
-    <TextView
-        android:id="@+id/tvPrivacyPolicy"
+        <Switch
+            android:id="@+id/switchPushNotifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:thumbTint="@color/light_gray"
+            android:trackTint="@color/black" />
+    </LinearLayout>
+
+    <!-- 개인정보처리방침 보기 (→ 화살표 포함) -->
+    <LinearLayout
+        android:id="@+id/layoutPrivacyPolicy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="개인정보처리방침 보기"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:padding="16dp"
         android:clickable="true"
-        android:focusable="true"
-        />
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/tvPrivacyPolicy"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="개인정보처리방침 보기"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_media_next"
+            android:textSize="18sp"
+            android:textColor="@android:color/darker_gray" />
+    </LinearLayout>
 
 
     <!-- 계정 탈퇴 버튼 -->
