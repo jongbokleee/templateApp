@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bienbetter.application.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.*
@@ -43,6 +45,29 @@ class LoginActivity : AppCompatActivity() {
             loginWithEmail(email, password)
         }
 
+        // 아이디 찾기
+        binding.tvFindEmail.setOnClickListener {
+            val emailInput = EditText(this).apply {
+                hint = "가입한 이메일 입력"
+                inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            }
+
+            AlertDialog.Builder(this)
+                .setTitle("이메일 확인")
+                .setMessage("가입 시 사용한 이메일을 입력해주세요.")
+                .setView(emailInput)
+                .setPositiveButton("확인") { _, _ ->
+                    val inputEmail = emailInput.text.toString().trim()
+                    if (inputEmail.isNotEmpty()) {
+                        checkEmailExists(inputEmail)
+                    } else {
+                        Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("취소", null)
+                .show()
+        }
+        
         // 비밀번호 찾기
         binding.tvFindPassword.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
@@ -89,6 +114,28 @@ class LoginActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener {
             finish()
         }
+    }
+
+    private fun checkEmailExists(email: String) {
+        val usersRef = FirebaseDatabase.getInstance().reference.child("users")
+        usersRef.orderByChild("email").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        AlertDialog.Builder(this@LoginActivity)
+                            .setTitle("확인 결과")
+                            .setMessage("해당 이메일은 가입된 계정입니다.")
+                            .setPositiveButton("확인", null)
+                            .show()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "등록되지 않은 이메일입니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@LoginActivity, "확인 중 오류 발생: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     private fun loginWithEmail(email: String, password: String) {

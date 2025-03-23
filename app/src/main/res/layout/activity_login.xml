@@ -74,18 +74,33 @@
         android:background="@android:drawable/edit_text"
         android:layout_marginTop="8dp" />
 
-    <!-- 비밀번호 재설정 링크 -->
-    <TextView
-        android:id="@+id/tvFindPassword"
+    <!-- 이메일/비밀번호 찾기 묶음 -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:text="비밀번호를 잊으셨나요?"
-        android:textColor="@android:color/holo_blue_dark"
-        android:textSize="14sp"
-        android:gravity="end"/>
+        android:gravity="end">
+
+        <TextView
+            android:id="@+id/tvFindEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이메일 찾기"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="14sp"
+            android:paddingEnd="12dp"/>
+
+        <TextView
+            android:id="@+id/tvFindPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="비밀번호 찾기"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="14sp"/>
+    </LinearLayout>
 
     <!-- 일반 로그인 버튼 -->
     <Button
