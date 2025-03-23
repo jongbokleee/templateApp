@@ -1,5 +1,6 @@
 package com.bienbetter.application
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -45,7 +46,12 @@ class AddScheduleActivity : AppCompatActivity() {
                 database.child("schedules").child(uid).push().setValue(schedule)
                     .addOnSuccessListener {
                         Toast.makeText(this, "일정이 저장되었습니다.", Toast.LENGTH_SHORT).show()
-                        finish() // 저장 후 홈으로 이동하려면
+                        // ✅ 홈으로 명시적으로 이동
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                        finish()
+
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, "저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
