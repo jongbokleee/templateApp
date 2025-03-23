@@ -12,15 +12,16 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bienbetter.application.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import java.util.regex.Pattern
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var auth: FirebaseAuth
-    private val database = FirebaseDatabase.getInstance().reference
+    private lateinit var database: DatabaseReference
     private var isEmailChecked = false
+    private var lastCheckedEmail = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,79 +29,51 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
 
-        // 약관, 개인정보 처리방침 링크
         binding.tvTerms.setOnClickListener { openWebPage("https://www.naver.com/") }
         binding.tvPrivacy.setOnClickListener { openWebPage("https://www.google.com/") }
         binding.backButton.setOnClickListener { finish() }
 
-        // 실시간 유효성 검사
+        // 이메일, 비밀번호 입력 유효성 감시
         val watcher = object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) = validateInputs()
+            override fun afterTextChanged(s: Editable?) {
+                binding.tvEmailCheckMessage.text = ""
+                isEmailChecked = false
+                validateInputs()
+            }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
 
+        binding.etEmail.addTextChangedListener(watcher)
+        binding.etRegisterPassword.addTextChangedListener(watcher)
+
+        // ✅ 이메일 중복 확인 버튼
         binding.btnCheckEmail.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
-
             if (!isEmailValid(email)) {
-                binding.tvEmailCheckMessage.setTextColor(getColor(android.R.color.holo_red_dark))
-                binding.tvEmailCheckMessage.text = "올바른 이메일 형식이 아닙니다."
+                binding.tvEmailCheckMessage.apply {
+                    text = "올바른 이메일 형식이 아닙니다."
+                    setTextColor(getColor(android.R.color.holo_red_dark))
+                    visibility = View.VISIBLE
+                }
                 isEmailChecked = false
                 return@setOnClickListener
             }
 
-            auth.fetchSignInMethodsForEmail(email)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val exists = task.result?.signInMethods?.isNotEmpty() == true
-                        if (exists) {
-                            binding.tvEmailCheckMessage.setTextColor(getColor(android.R.color.holo_red_dark))
-                            binding.tvEmailCheckMessage.text = "이미 등록된 이메일입니다."
-                            isEmailChecked = false
-                        } else {
-                            binding.tvEmailCheckMessage.setTextColor(getColor(android.R.color.holo_green_dark))
-                            binding.tvEmailCheckMessage.text = "사용 가능한 이메일입니다."
-                            isEmailChecked = true
-                        }
-                        validateInputs()
-                    } else {
-                        Toast.makeText(this, "이메일 확인 중 오류 발생", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            // Firebase Authentication + Database 확인
+            checkEmailDuplication(email)
         }
 
-        binding.etEmail.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                isEmailChecked = false
-                validateInputs()
-                binding.tvEmailCheckMessage.text = "" // 이메일 바꾸면 메시지 리셋
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
-        binding.etRegisterPassword.addTextChangedListener(watcher)
-
-        // 회원가입 버튼 클릭
+        // ✅ 회원가입 버튼
         binding.btnRegister.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etRegisterPassword.text.toString().trim()
 
-            if (!isEmailChecked) {
+            if (!isEmailChecked || email != lastCheckedEmail) {
                 Toast.makeText(this, "이메일 중복 확인을 먼저 진행해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "이메일과 비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (!isEmailValid(email)) {
-                Toast.makeText(this, "올바른 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -114,37 +87,48 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            checkEmailAndRegister(email, password)
+            registerWithEmail(email, password)
         }
     }
 
-    // ✅ 이메일 중복 확인 후 회원가입
-    private fun checkEmailAndRegister(email: String, password: String) {
+    // ✅ 이메일 중복 확인 (Authentication + Database)
+    private fun checkEmailDuplication(email: String) {
         auth.fetchSignInMethodsForEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val exists = task.result?.signInMethods?.isNotEmpty() == true
-                    if (exists) {
-                        binding.tvEmailCheckMessage.apply {
-                            text = "이미 등록된 이메일입니다."
-                            setTextColor(getColor(android.R.color.holo_red_dark))
-                            visibility = View.VISIBLE
+            .addOnSuccessListener { authResult ->
+                val authExists = authResult.signInMethods?.isNotEmpty() == true
+
+                // Database 확인
+                database.child("users").orderByChild("email").equalTo(email)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val dbExists = snapshot.exists()
+                            if (authExists || dbExists) {
+                                binding.tvEmailCheckMessage.apply {
+                                    text = "이미 등록된 이메일입니다."
+                                    setTextColor(getColor(android.R.color.holo_red_dark))
+                                    visibility = View.VISIBLE
+                                }
+                                isEmailChecked = false
+                            } else {
+                                binding.tvEmailCheckMessage.apply {
+                                    text = "사용 가능한 이메일입니다."
+                                    setTextColor(getColor(android.R.color.holo_green_dark))
+                                    visibility = View.VISIBLE
+                                }
+                                isEmailChecked = true
+                                lastCheckedEmail = email
+                            }
+                            validateInputs()
                         }
-                    } else {
-                        binding.tvEmailCheckMessage.apply {
-                            text = "사용 가능한 이메일입니다."
-                            setTextColor(getColor(android.R.color.holo_green_dark))
-                            visibility = View.VISIBLE
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Toast.makeText(this@RegisterActivity, "이메일 확인 실패", Toast.LENGTH_SHORT).show()
+                            Log.e("RegisterActivity", "DB 확인 실패: ${error.message}")
                         }
-                        registerWithEmail(email, password)
-                    }
-                } else {
-                    binding.tvEmailCheckMessage.apply {
-                        text = "이메일 확인 중 오류가 발생했습니다."
-                        setTextColor(getColor(android.R.color.holo_red_dark))
-                        visibility = View.VISIBLE
-                    }
-                }
+                    })
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "이메일 확인 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -189,7 +173,7 @@ class RegisterActivity : AppCompatActivity() {
         binding.etEmail.error = if (!emailValid && email.isNotEmpty()) "이메일 형식이 올바르지 않습니다" else null
         binding.etRegisterPassword.error = if (!passwordValid && password.isNotEmpty()) "영문, 숫자, 특수문자 포함 8자 이상" else null
 
-        binding.btnRegister.isEnabled = emailValid && passwordValid
+        binding.btnRegister.isEnabled = emailValid && passwordValid && isEmailChecked
     }
 
     private fun isEmailValid(email: String): Boolean {
