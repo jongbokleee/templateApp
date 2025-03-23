@@ -31,8 +31,12 @@ class RegisterActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
 
-        binding.tvTerms.setOnClickListener { openWebPage("https://www.naver.com/") }
-        binding.tvPrivacy.setOnClickListener { openWebPage("https://www.google.com/") }
+        binding.tvTerms.setOnClickListener {
+            showTermsDialog()
+        }
+        binding.tvPrivacy.setOnClickListener {
+            showPrivacyPolicyDialog()
+        }
         binding.backButton.setOnClickListener { finish() }
 
         // 이메일, 비밀번호 유효성 검사
@@ -93,6 +97,39 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             registerWithEmail(email, password)
+        }
+    }
+
+    private fun showTermsDialog() {
+        val termsText = getString(R.string.terms_of_service_text)
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("서비스 이용약관")
+            .setMessage(termsText)
+            .setPositiveButton("닫기", null)
+            .create()
+
+        dialog.show()
+
+        // 스크롤 가능하게 처리
+        dialog.findViewById<android.widget.TextView>(android.R.id.message)?.movementMethod =
+            android.text.method.ScrollingMovementMethod()
+    }
+
+    private fun showPrivacyPolicyDialog() {
+        val privacyText = getString(R.string.privacy_policy_text)
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("개인정보처리방침")
+            .setMessage(privacyText)
+            .setPositiveButton("닫기", null)
+            .create()
+
+        dialog.show()
+
+        // 메시지 스크롤 가능하게 설정
+        dialog.findViewById<android.widget.TextView>(android.R.id.message)?.apply {
+            movementMethod = android.text.method.ScrollingMovementMethod()
         }
     }
 
