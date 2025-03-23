@@ -35,20 +35,25 @@ class RegisterActivity : AppCompatActivity() {
         binding.tvPrivacy.setOnClickListener { openWebPage("https://www.google.com/") }
         binding.backButton.setOnClickListener { finish() }
 
-        // 이메일, 비밀번호 입력 유효성 감시
-        val watcher = object : TextWatcher {
+        // 이메일, 비밀번호 유효성 검사
+        binding.etEmail.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                binding.tvEmailCheckMessage.text = ""
-                isEmailChecked = false
+                val currentEmail = s.toString().trim()
+                if (currentEmail != lastCheckedEmail) {
+                    isEmailChecked = false
+                    binding.tvEmailCheckMessage.text = ""
+                }
                 validateInputs()
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        }
+        })
 
-        binding.etEmail.addTextChangedListener(watcher)
-        binding.etRegisterPassword.addTextChangedListener(watcher)
+        binding.etRegisterPassword.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) = validateInputs()
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         // ✅ 이메일 중복 확인 버튼
         binding.btnCheckEmail.setOnClickListener {
