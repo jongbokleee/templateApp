@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -47,63 +48,92 @@ class LoginActivity : AppCompatActivity() {
 
         // 아이디 찾기
         binding.tvFindEmail.setOnClickListener {
-            val emailInput = EditText(this).apply {
-                hint = "가입한 이메일 입력"
-                inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            val dialogView = layoutInflater.inflate(R.layout.dialog_find_email, null)
+            val emailEditText = dialogView.findViewById<EditText>(R.id.etFindEmail)
+            val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
+            val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
+
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+            btnCancel.setOnClickListener {
+                dialog.dismiss()
             }
 
-            AlertDialog.Builder(this)
-                .setTitle("이메일 확인")
-                .setMessage("가입 시 사용한 이메일을 입력해주세요.")
-                .setView(emailInput)
-                .setPositiveButton("확인") { _, _ ->
-                    val inputEmail = emailInput.text.toString().trim()
-                    if (inputEmail.isNotEmpty()) {
-                        checkEmailExists(inputEmail)
-                    } else {
-                        Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
-                    }
+            btnConfirm.setOnClickListener {
+                val inputEmail = emailEditText.text.toString().trim()
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(inputEmail).matches()) {
+                    Toast.makeText(this, "올바른 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
                 }
-                .setNegativeButton("취소", null)
-                .show()
+
+                if (inputEmail.isNotEmpty()) {
+                    checkEmailExists(inputEmail)
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            dialog.show()
         }
         
         // 비밀번호 찾기
         binding.tvFindPassword.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
+            val dialogView = layoutInflater.inflate(R.layout.dialog_find_email, null)
+            val emailEditText = dialogView.findViewById<EditText>(R.id.etFindEmail)
+            val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
+            val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
-            if (email.isEmpty()) {
-                Toast.makeText(this, "비밀번호 재설정을 위해 이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+            btnCancel.setOnClickListener {
+                dialog.dismiss()
             }
 
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                Toast.makeText(this, "올바른 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            btnConfirm.setOnClickListener {
+                val inputEmail = emailEditText.text.toString().trim()
 
-            val usersRef = FirebaseDatabase.getInstance().reference.child("users")
-            usersRef.orderByChild("email").equalTo(email)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        Toast.makeText(this@LoginActivity, "비밀번호 재설정 이메일이 전송되었습니다.", Toast.LENGTH_LONG).show()
-                                    } else {
-                                        Toast.makeText(this@LoginActivity, "이메일 전송 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                if (inputEmail.isEmpty()) {
+                    Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(inputEmail).matches()) {
+                    Toast.makeText(this, "올바른 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                val usersRef = FirebaseDatabase.getInstance().reference.child("users")
+                usersRef.orderByChild("email").equalTo(inputEmail)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                FirebaseAuth.getInstance().sendPasswordResetEmail(inputEmail)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            Toast.makeText(this@LoginActivity, "비밀번호 재설정 메일이 전송되었습니다.", Toast.LENGTH_LONG).show()
+                                        } else {
+                                            Toast.makeText(this@LoginActivity, "이메일 전송 실패: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                        }
                                     }
-                                }
-                        } else {
-                            Toast.makeText(this@LoginActivity, "등록되지 않은 이메일입니다.", Toast.LENGTH_SHORT).show()
+                                dialog.dismiss()
+                            } else {
+                                Toast.makeText(this@LoginActivity, "등록되지 않은 이메일입니다.", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(this@LoginActivity, "데이터베이스 오류: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
+                        override fun onCancelled(error: DatabaseError) {
+                            Toast.makeText(this@LoginActivity, "데이터베이스 오류: ${error.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
+
+            dialog.show()
         }
 
         // 회원가입 이동
