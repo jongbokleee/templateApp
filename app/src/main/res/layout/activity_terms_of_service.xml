@@ -214,8 +214,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/section1"
             android:text="제1조. 목적
-            \n본 약관은 비엔베러(이하 회사)가 제공하는 건강검진 알리미 앱 및 관련 서비스(이하 서비스)의 이용과 관련하여
-            회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.\n"
+            \n본 약관은 비엔베러(이하 회사)가 제공하는 건강검진 알리미 앱 및 관련 서비스(이하 서비스)의 이용과 관련하여 회사와 이용자 간의 권리, 의무, 책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.\n"
             android:textSize="15sp"
             android:textColor="@android:color/black"
             android:layout_marginTop="24dp"
@@ -227,8 +226,7 @@
             android:id="@+id/section2"
             android:text="제2조. 용어의 정의
             \n1. 이용자란 본 약관에 따라 회사가 제공하는 서비스를 이용하는 자를 말합니다.
-            \n2. 회원이란 회사의 서비스에 접속하여 본 약관에 동의하고,
-            회원가입을 완료한 자를 말합니다."
+            \n2. 회원이란 회사의 서비스에 접속하여 본 약관에 동의하고, 회원가입을 완료한 자를 말합니다."
             android:textSize="15sp"
             android:textColor="@android:color/black"
             android:layout_marginTop="24dp"
@@ -463,18 +461,13 @@
             android:text="제18조. 회사 정보
             \n- 회사명: 비엔베러
             \n- 이메일: bienbetter@gmail.com
-            \n- 주소: (회사 주소 입력 예정)
-            \n- 대표자: (대표자명 입력 예정)
-            \n\n공지일자: 2025년 03월 30일\n시행일자: 2025년 3월 30일"
+            \n- 주소: 경기도 안양시 동안구 동안로 209, 306동 1301호(비산동, 관악아파트)
+            \n- 대표자: 황민정
+            \n\n공지일자: 2025년 03월 30일\n시행일자: 2025년 03월 30일"
             android:textSize="15sp"
             android:textColor="@android:color/black"
             android:layout_marginTop="24dp"
             android:padding="8dp" />
-
-
-
-
-
 
     </LinearLayout>
 </ScrollView>

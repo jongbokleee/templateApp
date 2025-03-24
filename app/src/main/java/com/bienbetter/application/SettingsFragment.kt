@@ -59,6 +59,13 @@ class SettingsFragment : Fragment() {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
 
+        // 서비스 이용약관
+        binding.layoutTermsOfService.setOnClickListener {
+            val intent = Intent(requireContext(), TermsOfServiceActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 개인정보 처리방침
         binding.layoutPrivacyPolicy.setOnClickListener {
             val intent = Intent(requireContext(), PrivacyPolicyActivity::class.java)
             startActivity(intent)
