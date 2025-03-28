@@ -10,6 +10,8 @@ import android.os.Looper
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bienbetter.application.databinding.ActivityOnboardingBinding
+import android.net.Uri
+import com.google.firebase.database.FirebaseDatabase
 
 class OnboardingActivity : AppCompatActivity() {
 
@@ -21,15 +23,6 @@ class OnboardingActivity : AppCompatActivity() {
         // ViewBinding 초기화
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // ✅ SharedPreferences 확인 → 온보딩이 이미 완료되었으면 `MainActivity`로 이동
-        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
-        val isFirstRun = sharedPreferences.getBoolean("isFirstRun", true)
-
-        if (!isFirstRun) {
-            navigateToMain()
-            return
-        }
 
         // 네트워크 체크 후 이동
         checkNetworkAndProceed()
@@ -45,15 +38,65 @@ class OnboardingActivity : AppCompatActivity() {
 
     private fun checkNetworkAndProceed() {
         if (isNetworkAvailable()) {
-            // 1초 후 MainActivity로 이동
-            Handler(Looper.getMainLooper()).postDelayed({
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }, 1000)
+            checkForceUpdate()
         } else {
-            // 네트워크 오류 팝업 표시
             showNetworkErrorDialog()
         }
+    }
+
+    private fun checkForceUpdate() {
+        val dbRef = FirebaseDatabase.getInstance().reference.child("config")
+        dbRef.get().addOnSuccessListener { snapshot ->
+            val latestVersion = snapshot.child("latest_version").getValue(String::class.java) ?: return@addOnSuccessListener
+            val forceUpdate = snapshot.child("force_update").getValue(Boolean::class.java) ?: false
+            val updateUrl = snapshot.child("update_url").getValue(String::class.java) ?: return@addOnSuccessListener
+
+            val currentVersion = getCurrentAppVersion()
+
+            if (forceUpdate && isVersionLower(currentVersion, latestVersion)) {
+                showForceUpdateDialog(updateUrl)
+            } else {
+                proceedToNextStep()
+            }
+        }.addOnFailureListener {
+            proceedToNextStep()
+        }
+    }
+
+    private fun getCurrentAppVersion(): String {
+        return packageManager.getPackageInfo(packageName, 0).versionName
+    }
+
+    private fun isVersionLower(current: String, latest: String): Boolean {
+        val currentParts = current.split(".")
+        val latestParts = latest.split(".")
+
+        for (i in 0 until maxOf(currentParts.size, latestParts.size)) {
+            val cur = currentParts.getOrNull(i)?.toIntOrNull() ?: 0
+            val lat = latestParts.getOrNull(i)?.toIntOrNull() ?: 0
+            if (cur < lat) return true
+            if (cur > lat) return false
+        }
+        return false
+    }
+
+    private fun showForceUpdateDialog(updateUrl: String) {
+        AlertDialog.Builder(this)
+            .setTitle("업데이트 필요")
+            .setMessage("최신 버전으로 업데이트하지 않으면 앱을 사용할 수 없습니다.")
+            .setCancelable(false)
+            .setPositiveButton("업데이트") { _, _ ->
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl)))
+                finish()
+            }
+            .show()
+    }
+
+    private fun proceedToNextStep() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }, 1000)
     }
 
     private fun showNetworkErrorDialog() {
